@@ -6,7 +6,7 @@
 #    By: mshagga <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/07/25 16:54:34 by mshagga           #+#    #+#              #
-#    Updated: 2019/09/18 18:25:06 by mshagga          ###   ########.fr        #
+#    Updated: 2019/11/03 16:41:04 by mshagga          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,12 +25,15 @@ LIBFT = $(LIBFT_DIR)libft.a
 INC = $(addprefix $(INC_DIR), $(INC_LST))
 MLX = $(MLX_DIR)libmlx.a
 
-SRC_LST = main.c		\
+SRC_LST =	main.c \
+		    handler.c \
+		    tools.c \
+		    set_kernel.c \
 
 OBJ_LST = $(patsubst %.c, %.o, $(SRC_LST))
 
 IFLAGS = -I $(INC_DIR) -I $(MLX_DIR) -I $(LIBFT_DIR)
-LFLAGS = -L $(MLX_DIR) -lmlx -L $(LIBFT_DIR) -lft -framework OpenGL -framework Appkit
+LFLAGS = -L $(MLX_DIR) -lmlx -L $(LIBFT_DIR) -lft -framework OpenGL -framework Appkit -framework OpenCL
 
 SRC = $(addprefix $(SRC_DIR), $(SRC_LST))
 OBJ = $(addprefix $(OBJ_DIR), $(OBJ_LST))
