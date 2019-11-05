@@ -29,6 +29,7 @@ SRC_LST =	main.c \
 		    handler.c \
 		    tools.c \
 		    set_kernel.c \
+		    draw.c \
 
 OBJ_LST = $(patsubst %.c, %.o, $(SRC_LST))
 

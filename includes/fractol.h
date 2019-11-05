@@ -18,15 +18,14 @@
 # include <OpenCL/opencl.h>
 # include <math.h>
 
-# define WIDTH 900
-# define HEIGHT 600
+# define WIDTH 1920
+# define HEIGHT 1080
 
 # define RED_BUTTON	17
 # define ESC		53
 
 typedef struct	s_img
 {
-//	char	*data;
 	void 	*img;
 	int		bpp;
 	int		size_line;
@@ -45,15 +44,31 @@ typedef struct	s_kernel
 {
 	cl_kernel			core;
 	cl_command_queue	queue;
-	void				*data;
-	
-	cl_mem		*data_mem;
-
+	cl_program          prog;
+	cl_context          ctx;
+	cl_mem              buffer;
 }				t_kernel;
 
-void	*ptr = clCreateBuffer()
 void	event_handler(t_mlx *mlx);
+
+/*
+ * OpenCL kernel setup functions
+ */
+t_kernel    *init_kernel();
+int         load_kernel(t_kernel *kernel);
+int		    run_kernel(void *data);
+int         compile_kernel(t_kernel *kernel);
+
+/*
+ * Additional tools
+ */
+char    *read_kernel(char *filename);
 void	terminate(const char *err_mes);
-int		run_kernel(t_mlx *mlx);
+
+/*
+ * Delete it
+ */
+
+void    single_thread(void *data);
 
 #endif

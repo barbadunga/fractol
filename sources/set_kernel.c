@@ -11,56 +11,119 @@
 /* ************************************************************************** */
 
 #include "fractol.h"
+#include <stdio.h>
 
-char *load_kernel(char *filename)
+void        destroy_kernel(t_kernel **kernel)
 {
-	int		fd;
-	char	*kernel;
-	t_vec	*vec;
-	char	buf[1];
-
-	fd = open(filename, O_RDONLY);
-	if (!(vec = ft_vec_init(1, sizeof(char))))
-		return (NULL);
-	if (fd < 0 && read(fd, NULL, 0) < 0)
-		return (NULL);
-	while ((read(fd, buf, 1)) > 0)
-		if (!ft_vec_add(&vec, buf))
-			return (NULL);
-	ft_vec_add(&vec, "\0");
-	if (!(ft_vec_resize(&vec)))
-	{
-		ft_vec_del(&vec);
-		return (NULL);
-	}
-	kernel = vec->data;
-	ft_vec_del(&vec);
-	return (kernel);
+//    Clean all struct with OpenCL destroy methods
+    free(*kernel);
+    *kernel = NULL;
 }
 
-int		run_kernel(t_mlx *mlx)
+t_kernel    *init_kernel()
 {
-	cl_program			program[1];
-	cl_kernel			kernel[1];
-	cl_command_queue	cmd_queue;
-	cl_context			context;
-	cl_device_id		cpu = NULL, device = NULL;
-	cl_int				err = 0;
-	size_t				returned_size = 0;
-	size_t 				buffer_size;
-	char				*prog_src;
+    printf("INIT KERNEL\n");
+    t_kernel        *kernel;
+    cl_device_id    device;
+    int             ret;
 
-	err = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_CPU, 1, &cpu, NULL);
-	if (err != CL_SUCCESS)
-		return (-1);
-	err = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_CPU, 1, &cpu, NULL);
-	if (err != CL_SUCCESS)
-		device = cpu;
-	context = clCreateContext(0, 1, &device, NULL, NULL, &err);
+    if (!(kernel = (t_kernel*)malloc(sizeof(kernel))))
+        return (NULL);
+    ret = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+    if (ret != CL_SUCCESS)
+        return (NULL);
+    kernel->ctx = clCreateContext(0, 1, &device, NULL, NULL, &ret);
+    if (ret != CL_SUCCESS)
+        return (NULL);
+    kernel->queue = clCreateCommandQueue(kernel->ctx, device, 0, &ret);
+    if (ret != CL_SUCCESS)
+        return (NULL);
+    return (0);
+}
 
-	prog_src = load_kernel("fractals.cl");
-	void *ptr = clCreateBuffer();
-//	Check for success request
+int load_kernel(t_kernel *kernel)
+{
+    printf("LOAD KERNEL\n");
+    char    *source;
+    size_t  len;
+    int     ret;
 
-	return (1);
+    if (!(source = read_kernel("./sources/fractals.cl")))
+        return (1);
+    len = ft_strlen(source);
+    kernel->prog = clCreateProgramWithSource(kernel->ctx, 1, (const char **)&source, &len, &ret);
+    if (ret != CL_SUCCESS)
+        return (1);
+    ft_strdel(&source);
+    return (0);
+}
+
+int compile_kernel(t_kernel *kernel)
+{
+    printf("COMPILE KERNEL");
+    int ret;
+
+    ret = clBuildProgram(kernel->prog, 0, NULL, NULL, NULL, NULL);
+    if (ret != CL_SUCCESS)
+        return (1);
+    kernel->core = clCreateKernel(kernel->prog, "mandelbrot", &ret);
+    if (ret != CL_SUCCESS)
+        return (1);
+    return (0);
+}
+
+int set_args_kernel(t_kernel *kernel)
+{
+    printf("SET ARGS\n");
+    int     ret;
+    int     height;
+    int     width;
+
+    kernel->buffer = clCreateBuffer(kernel->ctx, CL_MEM_WRITE_ONLY, HEIGHT * WIDTH, NULL, &ret);
+    if (ret != CL_SUCCESS)
+        return (1);
+    ret = clSetKernelArg(kernel->core, 0, sizeof(cl_mem), &kernel->buffer);
+    if (ret != CL_SUCCESS)
+        return (1);
+    height = HEIGHT;
+    ret = clSetKernelArg(kernel->core, 1, sizeof(cl_int), &height);
+    if (ret != CL_SUCCESS)
+        return (1);
+    width = WIDTH;
+    ret = clSetKernelArg(kernel->core, 1, sizeof(cl_int), &width);
+    if (ret != CL_SUCCESS)
+        return (1);
+    return (0);
+}
+
+int run_kernel(void *data) {
+    t_kernel *kernel;
+    int ret;
+    size_t global_work_size;
+
+    if ((kernel = init_kernel())) {
+        printf("DROP INIT\n");
+        return (1);
+    }
+    if (load_kernel(kernel)) {
+        printf("DROP LOAD\n");
+        return (1);
+    }
+    if (compile_kernel(kernel)) {
+        printf("DROP COMPILE\n");
+        return (1);
+    }
+    if (set_args_kernel(kernel)) {
+        printf("DROP SET ARGS\n");
+        return (1);
+    }
+    global_work_size = HEIGHT * WIDTH;
+    printf("RUN KERNEL\n");
+    ret = clEnqueueNDRangeKernel(kernel->queue, kernel->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    clFinish(kernel->queue);
+    clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, HEIGHT * WIDTH, data, 0, NULL, NULL);
+    clFinish(kernel->queue);
+    clReleaseCommandQueue(kernel->queue);
+    clReleaseContext(kernel->ctx);
+    return (1);
 }
