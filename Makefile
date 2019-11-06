@@ -12,7 +12,7 @@
 
 BIN = fractol
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 
 MLX_DIR = ./minilibx_macos/
 LIBFT_DIR = ./Libft/
@@ -30,6 +30,7 @@ SRC_LST =	main.c \
 		    tools.c \
 		    set_kernel.c \
 		    draw.c \
+		    debug.c \
 
 OBJ_LST = $(patsubst %.c, %.o, $(SRC_LST))
 

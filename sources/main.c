@@ -41,8 +41,13 @@ int		main(void)
 	if (!(mlx = init()))
 		exit(1);
 	event_handler(mlx);
-	run_kernel(mlx->data);
+	if (run_kernel(mlx->data))
+	    terminate("error: kernel setup\n");
 //    single_thread(mlx->data);
+//    for (int i = 0; i < HEIGHT * WIDTH; i++)
+//    {
+//        printf("%d\n", ((int*)mlx->data)[i]);
+//    }
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img->img, 0, 0);
 	mlx_loop(mlx->mlx);
 	return (0);

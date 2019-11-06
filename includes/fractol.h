@@ -43,6 +43,8 @@ typedef struct s_mlx
 typedef struct	s_kernel
 {
 	cl_kernel			core;
+	cl_device_id        device;
+	cl_platform_id      platform;
 	cl_command_queue	queue;
 	cl_program          prog;
 	cl_context          ctx;
@@ -55,9 +57,7 @@ void	event_handler(t_mlx *mlx);
  * OpenCL kernel setup functions
  */
 t_kernel    *init_kernel();
-int         load_kernel(t_kernel *kernel);
 int		    run_kernel(void *data);
-int         compile_kernel(t_kernel *kernel);
 
 /*
  * Additional tools
@@ -68,7 +68,15 @@ void	terminate(const char *err_mes);
 /*
  * Delete it
  */
-
 void    single_thread(void *data);
+
+/*
+ * Debug info
+ */
+void    get_platform_info(cl_platform_id id);
+cl_device_id    get_device_info(cl_platform_id id, cl_device_info value_name);
+void    print_device_info(cl_device_id id);
+void    get_context_info(cl_context ctx);
+void    get_build_log(cl_program prog, cl_device_id id, cl_int errno);
 
 #endif

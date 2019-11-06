@@ -1,20 +1,28 @@
-kernel void mandelbrot(__global int data, __global int h, __global int w)
+kernel void mandelbrot(__global int *data, int h, int w)
 {
-    unsigned int x = get_global_id(0);
-    unsigned int y = get_global_id(1);
-    unsigned int i = 0;
+    double2 min, max;
+    double2  z, c;
+    double2 scale;
+    uint    max_iter = 100;
 
-    float a = -2.5+(((float)x)/size)*3.5;
-    float b = -1.75+(((float)y)/size)*3.5;
-    double2 z = (0.0, 0.0);
-    int     i;
-    for (i = 0; i < 100; i++) {
-        if (z.x*z.x + z.y*z.y > 4) {
-            break;
+    min = (double2)(-2.0, -1.5);
+    max.x = 1.0;
+    max.y = min.y + (max.x - min.x) * h / w;
+    scale.x = (max.x - min.x) / (w - 1);
+    scale.y = (max.y - min.y) / (h - 1);
+    int idx = get_global_id(0);
+    c.x = min.x + idx % w * scale.x;
+    c.y = max.y - idx / h * scale.y;
+    z = (0.0, 0.0);
+    for (int i = 0; i < max_iter; i++)
+    {
+        uint r2 = z.x * z.x + z.y * z.y;
+        if (r2 > 1e10)
+        {
+            data[idx] = i * 255 / max_iter;
+            return ;
         }
-        double tmp = z.x;
-        z.x = z.x*z.x - z.y*z.y + a;
-        z.y = 2*tmp*z.y + b;
+        z = (z.x * z.x - z.y * z.y + c.x, 2 * z.y * z.x + c.y);
     }
-    buffer[x + y*w] = i*255 / 100;
+    data[idx] = 0;
 }

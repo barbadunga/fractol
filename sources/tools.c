@@ -32,15 +32,12 @@ char *read_kernel(char *filename)
     if (fd < 0 && read(fd, NULL, 0) < 0)
         return (NULL);
     while ((read(fd, buf, 1)) > 0)
-        if (!ft_vec_add(&vec, buf))
+        if (!ft_vec_add(&vec, buf)) // free vec before
             return (NULL);
     ft_vec_add(&vec, "\0");
-    if (!(ft_vec_resize(&vec)))
-    {
-        ft_vec_del(&vec);
-        return (NULL);
-    }
-    kernel = vec->data;
+    if (!(kernel = (char*)malloc(vec->total)))
+        return (NULL); // free vec before
+    ft_strncpy(kernel, vec->data, vec->total + 1);
     ft_vec_del(&vec);
     return (kernel);
 }

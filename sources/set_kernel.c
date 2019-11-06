@@ -15,35 +15,42 @@
 
 void        destroy_kernel(t_kernel **kernel)
 {
-//    Clean all struct with OpenCL destroy methods
+//    Clean all struct with OpenCL release methods
     free(*kernel);
     *kernel = NULL;
 }
 
 t_kernel    *init_kernel()
 {
-    printf("INIT KERNEL\n");
     t_kernel        *kernel;
-    cl_device_id    device;
     int             ret;
+    cl_uint         ret_num_platforms;
+    cl_uint         ret_num_device;
 
     if (!(kernel = (t_kernel*)malloc(sizeof(kernel))))
         return (NULL);
-    ret = clGetDeviceIDs(NULL, CL_DEVICE_TYPE_GPU, 1, &device, NULL);
+    kernel->ctx = NULL;
+    kernel->prog = NULL;
+    ret = clGetPlatformIDs(1, &kernel->platform, &ret_num_platforms);
+    get_platform_info(kernel->platform); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);
-    kernel->ctx = clCreateContext(0, 1, &device, NULL, NULL, &ret);
+//    get_device_info(kernel->platform, CL_DEVICE_TYPE_ALL); // DELETE
+    ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device, &ret_num_device);
+    print_device_info(kernel->device); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);
-    kernel->queue = clCreateCommandQueue(kernel->ctx, device, 0, &ret);
+    kernel->ctx = clCreateContext(0, 1, &kernel->device, NULL, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (NULL);
-    return (0);
+    kernel->queue = clCreateCommandQueue(kernel->ctx, kernel->device, 0, &ret);
+    if (ret != CL_SUCCESS)
+        return (NULL);
+    return (kernel);
 }
 
 int load_kernel(t_kernel *kernel)
 {
-    printf("LOAD KERNEL\n");
     char    *source;
     size_t  len;
     int     ret;
@@ -55,26 +62,22 @@ int load_kernel(t_kernel *kernel)
     if (ret != CL_SUCCESS)
         return (1);
     ft_strdel(&source);
-    return (0);
-}
-
-int compile_kernel(t_kernel *kernel)
-{
-    printf("COMPILE KERNEL");
-    int ret;
-
-    ret = clBuildProgram(kernel->prog, 0, NULL, NULL, NULL, NULL);
-    if (ret != CL_SUCCESS)
+    ret = clBuildProgram(kernel->prog, 1, &kernel->device, NULL, NULL, NULL);
+    if (ret != CL_SUCCESS) {
+        get_build_log(kernel->prog, kernel->device, ret);
         return (1);
+    }
     kernel->core = clCreateKernel(kernel->prog, "mandelbrot", &ret);
-    if (ret != CL_SUCCESS)
+    if (ret != CL_SUCCESS) {
+        printf("Create Kernel: %d\n", ret);
         return (1);
+    }
     return (0);
 }
 
 int set_args_kernel(t_kernel *kernel)
 {
-    printf("SET ARGS\n");
+//    printf("SET ARGS\n");
     int     ret;
     int     height;
     int     width;
@@ -101,29 +104,20 @@ int run_kernel(void *data) {
     int ret;
     size_t global_work_size;
 
-    if ((kernel = init_kernel())) {
-        printf("DROP INIT\n");
+    if (!(kernel = init_kernel()))
         return (1);
-    }
-    if (load_kernel(kernel)) {
-        printf("DROP LOAD\n");
+    if (load_kernel(kernel))
         return (1);
-    }
-    if (compile_kernel(kernel)) {
-        printf("DROP COMPILE\n");
+    if (set_args_kernel(kernel))
         return (1);
-    }
-    if (set_args_kernel(kernel)) {
-        printf("DROP SET ARGS\n");
-        return (1);
-    }
     global_work_size = HEIGHT * WIDTH;
-    printf("RUN KERNEL\n");
     ret = clEnqueueNDRangeKernel(kernel->queue, kernel->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
+    if (ret != CL_SUCCESS)
+        return (1);
     clFinish(kernel->queue);
     clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, HEIGHT * WIDTH, data, 0, NULL, NULL);
     clFinish(kernel->queue);
     clReleaseCommandQueue(kernel->queue);
     clReleaseContext(kernel->ctx);
-    return (1);
+    return (0);
 }
