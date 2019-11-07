@@ -77,23 +77,22 @@ int load_kernel(t_kernel *kernel)
 
 int set_args_kernel(t_kernel *kernel)
 {
-//    printf("SET ARGS\n");
     int     ret;
     int     height;
     int     width;
 
-    kernel->buffer = clCreateBuffer(kernel->ctx, CL_MEM_WRITE_ONLY, HEIGHT * WIDTH, NULL, &ret);
+    kernel->buffer = clCreateBuffer(kernel->ctx, CL_MEM_WRITE_ONLY, sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (1);
     ret = clSetKernelArg(kernel->core, 0, sizeof(cl_mem), &kernel->buffer);
     if (ret != CL_SUCCESS)
         return (1);
     height = HEIGHT;
-    ret = clSetKernelArg(kernel->core, 1, sizeof(cl_int), &height);
+    ret = clSetKernelArg(kernel->core, 1, sizeof(int), &height);
     if (ret != CL_SUCCESS)
         return (1);
     width = WIDTH;
-    ret = clSetKernelArg(kernel->core, 1, sizeof(cl_int), &width);
+    ret = clSetKernelArg(kernel->core, 2, sizeof(int), &width);
     if (ret != CL_SUCCESS)
         return (1);
     return (0);
@@ -115,7 +114,9 @@ int run_kernel(void *data) {
     if (ret != CL_SUCCESS)
         return (1);
     clFinish(kernel->queue);
-    clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, HEIGHT * WIDTH, data, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, data, 0, NULL, NULL);
+    if (ret != CL_SUCCESS)
+        return (1);
     clFinish(kernel->queue);
     clReleaseCommandQueue(kernel->queue);
     clReleaseContext(kernel->ctx);

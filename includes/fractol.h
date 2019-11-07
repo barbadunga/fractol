@@ -17,16 +17,28 @@
 # include "mlx.h"
 # include <OpenCL/opencl.h>
 # include <math.h>
+# include <limits.h>
 
 # define WIDTH 1920
 # define HEIGHT 1080
-
 # define RED_BUTTON	17
 # define ESC		53
 
+typedef struct  s_param
+{
+    double  scale[2];
+    double  top[2];
+    double  bot[2];
+    double  move[2];
+    double  center[2];
+    double  radius;
+}               t_param;
+
 typedef struct	s_img
 {
+    t_param   *params;
 	void 	*img;
+	char    *data;
 	int		bpp;
 	int		size_line;
 	int		end;
@@ -51,6 +63,7 @@ typedef struct	s_kernel
 	cl_mem              buffer;
 }				t_kernel;
 
+
 void	event_handler(t_mlx *mlx);
 
 /*
@@ -64,11 +77,12 @@ int		    run_kernel(void *data);
  */
 char    *read_kernel(char *filename);
 void	terminate(const char *err_mes);
+void    render(t_mlx *mlx);
 
 /*
  * Delete it
  */
-void    single_thread(void *data);
+void    single_thread(void *data, t_param *box);
 
 /*
  * Debug info

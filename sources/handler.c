@@ -21,18 +21,51 @@ int		close_mlx(void *param)
 	exit(1);
 }
 
+void    move(int key, t_param *p)
+{
+    if (key == 123)
+        p->center[0] += 0.1;
+    if (key == 124)
+        p->center[0] -= 0.1;
+    if (key == 126)
+        p->center[1] += 0.1;
+    if (key == 125)
+        p->center[1] -= 0.1;
+}
+
+void    zoom(t_param *p)
+{
+    p->radius /= 2;
+}
+
 int		keyboard_event(int key, void *param)
 {
 	t_mlx	*mlx;
 
-	mlx = param;
+	mlx = (t_mlx*)param;
 	if (key == ESC)
-		close_mlx(mlx);
+		close_mlx((t_mlx*)param);
+	if (key == 123 || key == 126 || key == 125 || key == 124)
+	    move(key, mlx->img->params);
+	if (key == 24)
+	    zoom(mlx->img->params);
+	render(mlx);
 	return (1);
+}
+
+int     mouse_event(int key, void *param)
+{
+    t_mlx   *mlx;
+
+    mlx = (t_mlx*)param;
+    if (key)
+        return (0);
+    return (1);
 }
 
 void	event_handler(t_mlx *mlx)
 {
 	mlx_hook(mlx->win, RED_BUTTON, 1LU << (unsigned)17, close_mlx, mlx);
 	mlx_hook(mlx->win, 2, 0, keyboard_event, mlx);
+	mlx_hook(mlx->win, 4, 0, mouse_event, mlx);
 }

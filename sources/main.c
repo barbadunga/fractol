@@ -11,7 +11,26 @@
 /* ************************************************************************** */
 
 #include "fractol.h"
-#include <stdio.h>
+
+t_param *init_params()
+{
+    t_param *p;
+
+    if (!(p = (t_param*)malloc(sizeof(p))))
+        return (NULL);
+    p->top[0] = -2.0;
+    p->bot[0] = 1.0;
+    p->bot[1] = -1.0;
+    p->top[1] = p->bot[1] + (p->bot[0] - p->top[0]) * HEIGHT / WIDTH;
+    p->scale[0] = (p->bot[0] - p->top[0]) / (WIDTH - 1);
+    p->scale[1] = (p->top[1] - p->bot[1]) / (HEIGHT - 1);
+    p->radius = 1.0;
+    p->center[0] = -0.5;
+    p->center[1] = 0;
+    p->move[0] = 0.0;
+    p->move[1] = 0.0;
+    return (p);
+}
 
 // If fail allocation free all memory
 t_mlx	*init()
@@ -29,6 +48,8 @@ t_mlx	*init()
 		return (NULL);
 	if (!(img->img = mlx_new_image(mlx->mlx, WIDTH, HEIGHT)))
 		return (NULL);
+    if (!(img->params = init_params()))
+        return (NULL);
 	mlx->data = mlx_get_data_addr(img->img, &img->bpp, &img->size_line, &img->end);
 	mlx->img = img;
 	return (mlx);
@@ -41,14 +62,9 @@ int		main(void)
 	if (!(mlx = init()))
 		exit(1);
 	event_handler(mlx);
-	if (run_kernel(mlx->data))
-	    terminate("error: kernel setup\n");
-//    single_thread(mlx->data);
-//    for (int i = 0; i < HEIGHT * WIDTH; i++)
-//    {
-//        printf("%d\n", ((int*)mlx->data)[i]);
-//    }
-	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img->img, 0, 0);
+//	if (run_kernel(mlx->data))
+//	    terminate("error: kernel setup\n");
+    render(mlx);
 	mlx_loop(mlx->mlx);
 	return (0);
 }

@@ -1,0 +1,28 @@
+// modified code using center and radius to scan the plane
+  int height = 720;
+  int width = 1280;
+  double dWidth;
+  double dRadius = 1.5;
+  double complex center= -0.75*I;
+  double complex c;
+  int i,j;
+
+  double width2; // = width/2.0
+  double height2; // = height/2.0
+
+  width2 = width /2.0;
+  height2 = height/2.0;
+
+complex double coordinate(int i, int j, int width, int height, complex double center, double radius) {
+  double x = (i - width /2.0) / (height/2.0);
+  double y = (j - height/2.0) / (height/2.0);
+  complex double c = center + radius * (x - I * y);
+  return c;
+}
+
+for ( j = 0; j < height; ++j) {
+    for ( i = 0; i < width; ++i) {
+      c = coordinate(i, j, width, height, center, dRadius);
+      // do smth
+       }
+     }
