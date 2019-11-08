@@ -28,10 +28,9 @@ MLX = $(MLX_DIR)libmlx.a
 SRC_LST =	main.c \
 		    handler.c \
 		    tools.c \
-		    set_kernel.c \
 		    draw.c \
-		    debug.c \
-
+		    # debug.c \
+            # set_kernel.c
 OBJ_LST = $(patsubst %.c, %.o, $(SRC_LST))
 
 IFLAGS = -I $(INC_DIR) -I $(MLX_DIR) -I $(LIBFT_DIR)

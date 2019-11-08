@@ -24,18 +24,21 @@ int		close_mlx(void *param)
 void    move(int key, t_param *p)
 {
     if (key == 123)
-        p->center[0] += 0.1;
-    if (key == 124)
         p->center[0] -= 0.1;
+    if (key == 124)
+        p->center[0] += 0.1;
     if (key == 126)
-        p->center[1] += 0.1;
-    if (key == 125)
         p->center[1] -= 0.1;
+    if (key == 125)
+        p->center[1] += 0.1;
 }
 
-void    zoom(t_param *p)
+void    zoom(int key, t_param *p)
 {
-    p->radius /= 2;
+    if (key == 24)
+    	p->radius /= 2;
+    if (key == 27)
+    	p->radius *= 2;
 }
 
 int		keyboard_event(int key, void *param)
@@ -47,8 +50,8 @@ int		keyboard_event(int key, void *param)
 		close_mlx((t_mlx*)param);
 	if (key == 123 || key == 126 || key == 125 || key == 124)
 	    move(key, mlx->img->params);
-	if (key == 24)
-	    zoom(mlx->img->params);
+	if (key == 24 || key == 27)
+	    zoom(key, mlx->img->params);
 	render(mlx);
 	return (1);
 }

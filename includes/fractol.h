@@ -19,8 +19,8 @@
 # include <math.h>
 # include <limits.h>
 
-# define WIDTH 1920
-# define HEIGHT 1080
+# define WIDTH 1280
+# define HEIGHT 720
 # define RED_BUTTON	17
 # define ESC		53
 
