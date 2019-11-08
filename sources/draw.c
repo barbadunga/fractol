@@ -30,14 +30,11 @@ t_complex   init_complex(double r, double i)
 void	single_thread(void *data, t_param *p)
 {
     t_complex	c, z;
-    int			max_iter = 100;
     double		r2;
     int			color;
 
     for (int pixel = 0; pixel < HEIGHT * WIDTH; pixel++)
     {
-//        c.re = p->top[0] + pixel % (WIDTH) * p->scale[0] + p->move[0];
-//        c.im = p->top[1] - pixel / (HEIGHT) * p->scale[1] + p->move[1];
         c.re = p->center[0] + p->radius * ((pixel % WIDTH) - WIDTH / 2.0) / (HEIGHT / 2.0);
         c.im = p->center[1] + p->radius * ((pixel / HEIGHT) - HEIGHT / 2.0) / (HEIGHT / 2.0);
         z = init_complex(0, 0);

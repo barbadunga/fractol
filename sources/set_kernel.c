@@ -75,11 +75,10 @@ int load_kernel(t_kernel *kernel)
     return (0);
 }
 
-int set_args_kernel(t_kernel *kernel)
+int set_args_kernel(t_kernel *kernel, t_param *p)
 {
     int     ret;
-    int     height;
-    int     width;
+    double  view[3];
 
     kernel->buffer = clCreateBuffer(kernel->ctx, CL_MEM_WRITE_ONLY, sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
     if (ret != CL_SUCCESS)
@@ -87,18 +86,17 @@ int set_args_kernel(t_kernel *kernel)
     ret = clSetKernelArg(kernel->core, 0, sizeof(cl_mem), &kernel->buffer);
     if (ret != CL_SUCCESS)
         return (1);
-    height = HEIGHT;
-    ret = clSetKernelArg(kernel->core, 1, sizeof(int), &height);
+    ret = clSetKernelArg(kernel->core, 1, sizeof(double*), &p->center);
     if (ret != CL_SUCCESS)
         return (1);
-    width = WIDTH;
-    ret = clSetKernelArg(kernel->core, 2, sizeof(int), &width);
+    view[0] = p->radius; // Add more params to view
+    ret = clSetKernelArg(kernel->core, 2, sizeof(view), &view);
     if (ret != CL_SUCCESS)
         return (1);
     return (0);
 }
 
-int run_kernel(void *data) {
+int run_kernel(t_mlx *mlx) {
     t_kernel *kernel;
     int ret;
     size_t global_work_size;
@@ -107,14 +105,14 @@ int run_kernel(void *data) {
         return (1);
     if (load_kernel(kernel))
         return (1);
-    if (set_args_kernel(kernel))
+    if (set_args_kernel(kernel, mlx->img->params))
         return (1);
     global_work_size = HEIGHT * WIDTH;
     ret = clEnqueueNDRangeKernel(kernel->queue, kernel->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
     if (ret != CL_SUCCESS)
         return (1);
     clFinish(kernel->queue);
-    ret = clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, data, 0, NULL, NULL);
+    ret = clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL);
     if (ret != CL_SUCCESS)
         return (1);
     clFinish(kernel->queue);

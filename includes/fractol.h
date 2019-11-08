@@ -19,19 +19,37 @@
 # include <math.h>
 # include <limits.h>
 
-# define WIDTH 1280
-# define HEIGHT 720
-# define RED_BUTTON	17
-# define ESC		53
+/*
+ * Screen settings
+ */
+# define WIDTH          1280
+# define HEIGHT         720
+
+/*
+ * Control keys MacOs
+ */
+# define LEFT_BUTTON    1
+# define SCROLL_UP      4
+# define SCROLL_DOWN    5
+# define LEFT           123
+# define UP             126
+# define RIGHT          124
+# define DOWN           125
+# define RED_BUTTON     17
+# define ESC            53
+# define D_KEY          2
+# define C_KEY          8
+# define S_KEY          1
+# define PLUS_KEY       24
+# define MINUS_KEY      27
 
 typedef struct  s_param
 {
-    double  scale[2];
-    double  top[2];
-    double  bot[2];
-    double  move[2];
     double  center[2];
+    int     click_pos[2];
     double  radius;
+    int     zoom;
+    int     is_click;
 }               t_param;
 
 typedef struct	s_img
@@ -64,13 +82,15 @@ typedef struct	s_kernel
 }				t_kernel;
 
 
-void	event_handler(t_mlx *mlx);
+int max_iter = 50;
 
+void	event_handler(t_mlx *mlx);
+void    set_default_view(t_param *p);
 /*
  * OpenCL kernel setup functions
  */
 t_kernel    *init_kernel();
-int		    run_kernel(void *data);
+int		    run_kernel(t_mlx *mlx);
 
 /*
  * Additional tools
