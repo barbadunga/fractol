@@ -13,7 +13,8 @@ typedef struct s_complex
 
 void        render(t_mlx *mlx)
 {
-    single_thread(mlx->data, mlx->img->params);
+//    single_thread(mlx->data, mlx->img->params);
+	run_kernel(mlx); // check return
     mlx_clear_window(mlx->mlx, mlx->win);
     mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img->img, 0, 0);
 }
@@ -32,6 +33,7 @@ void	single_thread(void *data, t_param *p)
     t_complex	c, z;
     double		r2;
     int			color;
+	const int	max_iter = 50;
 
     for (int pixel = 0; pixel < HEIGHT * WIDTH; pixel++)
     {

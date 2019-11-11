@@ -43,33 +43,6 @@
 # define PLUS_KEY       24
 # define MINUS_KEY      27
 
-typedef struct  s_param
-{
-    double  center[2];
-    int     click_pos[2];
-    double  radius;
-    int     zoom;
-    int     is_click;
-}               t_param;
-
-typedef struct	s_img
-{
-    t_param   *params;
-	void 	*img;
-	char    *data;
-	int		bpp;
-	int		size_line;
-	int		end;
-}				t_img;
-
-typedef struct s_mlx
-{
-	void	*win;
-	void	*mlx;
-	t_img	*img;
-	char	*data;
-}				t_mlx;
-
 typedef struct	s_kernel
 {
 	cl_kernel			core;
@@ -81,8 +54,32 @@ typedef struct	s_kernel
 	cl_mem              buffer;
 }				t_kernel;
 
+typedef struct  s_param
+{
+    double  center[2];
+    int     click_pos[2];
+    double  radius;
+    int     is_click;
+}               t_param;
 
-int max_iter = 50;
+typedef struct	s_img
+{
+    t_param	*params;
+	void	*img;
+	char	*data;
+	int		bpp;
+	int		size_line;
+	int		end;
+}				t_img;
+
+typedef struct s_mlx
+{
+	void		*win;
+	void		*mlx;
+	t_img		*img;
+	char		*data;
+	t_kernel	*kernel;
+}				t_mlx;
 
 void	event_handler(t_mlx *mlx);
 void    set_default_view(t_param *p);
@@ -90,7 +87,8 @@ void    set_default_view(t_param *p);
  * OpenCL kernel setup functions
  */
 t_kernel    *init_kernel();
-int		    run_kernel(t_mlx *mlx);
+int		    new_kernel(t_mlx *mlx);
+int			run_kernel(t_mlx * mlx);
 
 /*
  * Additional tools

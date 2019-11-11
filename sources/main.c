@@ -20,7 +20,6 @@ void    set_default_view(t_param *p)
     p->click_pos[0] = 0;
     p->click_pos[1] = 0;
     p->is_click = 0;
-    p->zoom = 0;
 }
 
 // If fail allocation free all memory
@@ -54,8 +53,8 @@ int		main(void)
 	if (!(mlx = init()))
 		exit(1);
 	event_handler(mlx);
-//	if (run_kernel(mlx))
-//	    terminate("error: kernel setup\n");
+	if (new_kernel(mlx))
+	    terminate("error: kernel setup\n");
 //    single_thread(mlx->data, mlx->img->params);
     render(mlx);
 	mlx_loop(mlx->mlx);

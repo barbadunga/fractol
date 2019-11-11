@@ -52,10 +52,10 @@ int		keyboard_event(int key, void *param)
 	    set_default_view(mlx->img->params);
 	if (key == S_KEY)
 	    show();
-	if (key == PLUS_KEY)
-	    max_iter++;
-	if (key == MINUS_KEY)
-	    max_iter--;
+//	if (key == PLUS_KEY)
+//	    max_iter++;
+//	if (key == MINUS_KEY)
+//	    max_iter--;
     render(mlx);
 	return (1);
 }
@@ -64,6 +64,7 @@ int     mouse_press(int button, int x, int y, void *param)
 {
     t_mlx       *mlx;
     t_param     *p;
+    double		zoom;
 
     mlx = (t_mlx*)param;
     p = mlx->img->params;
@@ -75,11 +76,12 @@ int     mouse_press(int button, int x, int y, void *param)
     }
     if (button == SCROLL_UP || button == SCROLL_DOWN)
     {
+    	zoom = 0.0;
         if (button == SCROLL_UP)
-            p->zoom++;
+            zoom += 0.1;
         if (button == SCROLL_DOWN)
-            p->zoom--;
-        p->radius *= pow(2.0, -p->zoom);
+            zoom -= 0.1;
+        p->radius *= pow(2.0, -zoom);
     }
     render(mlx);
     return (1);
@@ -93,10 +95,8 @@ int     mouse_release(int button, int x, int y, void *param)
     mlx = (t_mlx*)param;
     p = mlx->img->params;
     if (button == LEFT_BUTTON)
-    {
         p->is_click = 0;
-        printf("click:\n\t%d\t%d\n", x - p->click_pos[0], y - p->click_pos[1]);
-    }
+    x -= y;
     return (1);
 }
 

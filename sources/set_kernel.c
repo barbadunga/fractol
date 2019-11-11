@@ -35,7 +35,6 @@ t_kernel    *init_kernel()
     get_platform_info(kernel->platform); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);
-//    get_device_info(kernel->platform, CL_DEVICE_TYPE_ALL); // DELETE
     ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device, &ret_num_device);
     print_device_info(kernel->device); // DELETE
     if (ret != CL_SUCCESS)
@@ -69,54 +68,60 @@ int load_kernel(t_kernel *kernel)
     }
     kernel->core = clCreateKernel(kernel->prog, "mandelbrot", &ret);
     if (ret != CL_SUCCESS) {
-        printf("Create Kernel: %d\n", ret);
         return (1);
     }
     return (0);
 }
 
-int set_args_kernel(t_kernel *kernel, t_param *p)
+int set_args_kernel(t_kernel *krnl)
 {
-    int     ret;
-    double  view[3];
+    int         ret;
+	const int	size_x = WIDTH;
+	const int	size_y = HEIGHT;
 
-    kernel->buffer = clCreateBuffer(kernel->ctx, CL_MEM_WRITE_ONLY, sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
+    krnl->buffer = clCreateBuffer(krnl->ctx, CL_MEM_WRITE_ONLY, sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (1);
-    ret = clSetKernelArg(kernel->core, 0, sizeof(cl_mem), &kernel->buffer);
-    if (ret != CL_SUCCESS)
-        return (1);
-    ret = clSetKernelArg(kernel->core, 1, sizeof(double*), &p->center);
-    if (ret != CL_SUCCESS)
-        return (1);
-    view[0] = p->radius; // Add more params to view
-    ret = clSetKernelArg(kernel->core, 2, sizeof(view), &view);
-    if (ret != CL_SUCCESS)
-        return (1);
+    if ((ret = clSetKernelArg(krnl->core, 0, sizeof(cl_mem), &krnl->buffer)))
+    	return (1);
+	if ((ret = clSetKernelArg(krnl->core, 1, sizeof(int), &size_x)))
+		return (1);
+	if ((ret = clSetKernelArg(krnl->core, 2, sizeof(int), &size_y)))
+		return (1);
     return (0);
 }
 
-int run_kernel(t_mlx *mlx) {
+int	run_kernel(t_mlx *mlx)
+{
+	const size_t	global_work_size = HEIGHT * WIDTH;
+	const t_param	*p = mlx->img->params;
+	const t_kernel	*krnl = mlx->kernel;
+	int				ret;
+
+	if ((ret = clSetKernelArg(krnl->core, 3, sizeof(double), &(p->center[0]))))
+		return (1);
+	if ((ret = clSetKernelArg(krnl->core, 4, sizeof(double), &(p->center[1]))))
+		return (1);
+	if ((ret = clSetKernelArg(krnl->core, 5, sizeof(double), &(p->radius))))
+		return (1);
+	if ((ret = clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL)))
+		return (1);
+	clFinish(krnl->queue);
+	if ((ret = clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL)))
+		return (1);
+	clFinish(krnl->queue);
+	return (0);
+}
+
+int new_kernel(t_mlx *mlx) {
     t_kernel *kernel;
-    int ret;
-    size_t global_work_size;
 
     if (!(kernel = init_kernel()))
         return (1);
     if (load_kernel(kernel))
         return (1);
-    if (set_args_kernel(kernel, mlx->img->params))
-        return (1);
-    global_work_size = HEIGHT * WIDTH;
-    ret = clEnqueueNDRangeKernel(kernel->queue, kernel->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL);
-    if (ret != CL_SUCCESS)
-        return (1);
-    clFinish(kernel->queue);
-    ret = clEnqueueReadBuffer(kernel->queue, kernel->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL);
-    if (ret != CL_SUCCESS)
-        return (1);
-    clFinish(kernel->queue);
-    clReleaseCommandQueue(kernel->queue);
-    clReleaseContext(kernel->ctx);
+    if (set_args_kernel(kernel))
+		return (1);
+    mlx->kernel = kernel;
     return (0);
 }
