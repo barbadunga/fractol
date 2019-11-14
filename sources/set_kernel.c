@@ -15,7 +15,6 @@
 
 void        destroy_kernel(t_kernel **kernel)
 {
-//    Clean all struct with OpenCL release methods
 	clReleaseKernel((*kernel)->core);
 	clReleaseMemObject((*kernel)->buffer);
 	clReleaseContext((*kernel)->ctx);
@@ -40,7 +39,7 @@ t_kernel    *init_kernel()
     get_platform_info(kernel->platform); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);
-    ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_CPU, 1, &kernel->device, &ret_num_device);
+    ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device, &ret_num_device);
     print_device_info(kernel->device); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);
@@ -101,18 +100,19 @@ int	run_kernel(t_mlx *mlx)
 	const size_t	global_work_size = HEIGHT * WIDTH;
 	const t_param	*p = mlx->img->params;
 	const t_kernel	*krnl = mlx->kernel;
-	int				ret;
 
-	if ((ret = clSetKernelArg(krnl->core, 3, sizeof(double), &(p->center[0]))))
+	if (clSetKernelArg(krnl->core, 3, sizeof(double), &(p->center[0])))
 		return (1);
-	if ((ret = clSetKernelArg(krnl->core, 4, sizeof(double), &(p->center[1]))))
+	if (clSetKernelArg(krnl->core, 4, sizeof(double), &(p->center[1])))
 		return (1);
-	if ((ret = clSetKernelArg(krnl->core, 5, sizeof(double), &(p->radius))))
+	if (clSetKernelArg(krnl->core, 5, sizeof(double), &(p->radius)))
 		return (1);
-	if ((ret = clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL)))
+	if (clSetKernelArg(krnl->core, 6, sizeof(int), &(p->max_iter)))
+		return (1);
+	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
-	if ((ret = clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL)))
+	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
 	return (0);
@@ -123,10 +123,11 @@ int new_kernel(t_mlx *mlx) {
 
     if (!(kernel = init_kernel()))
         return (1);
-    if (load_kernel(kernel))
-        return (1);
-    if (set_args_kernel(kernel))
-		return (1);
+    if (load_kernel(kernel) || set_args_kernel(kernel))
+	{
+    	destroy_kernel(&kernel);
+    	return (1);
+	}
     mlx->kernel = kernel;
     return (0);
 }

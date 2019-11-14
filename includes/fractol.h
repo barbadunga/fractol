@@ -22,8 +22,8 @@
 /*
  * Screen settings
  */
-# define WIDTH          1280
-# define HEIGHT         720
+# define WIDTH          1200
+# define HEIGHT         1200
 
 /*
  * Control keys MacOs
@@ -59,6 +59,7 @@ typedef struct  s_param
     double  center[2];
     int     click_pos[2];
     double  radius;
+    int		max_iter;
     int     is_click;
 }               t_param;
 

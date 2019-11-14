@@ -43,22 +43,22 @@ void    show()
 
 int		keyboard_event(int key, void *param)
 {
-	t_mlx	*mlx;
+	t_param	*p;
 
-	mlx = (t_mlx*)param;
+	p = ((t_mlx*)param)->img->params;
 	if (key == ESC)
 		close_mlx((t_mlx*)param);
 	if (key == LEFT || key == UP || key == DOWN || key == RIGHT)
-	    move(key, mlx->img->params);
+	    move(key, p);
 	if (key == D_KEY)
-	    set_default_view(mlx->img->params);
+	    set_default_view(p);
 	if (key == S_KEY)
 	    show();
-//	if (key == PLUS_KEY)
-//	    max_iter++;
-//	if (key == MINUS_KEY)
-//	    max_iter--;
-    render(mlx);
+	if (key == PLUS_KEY)
+	    p->max_iter++;
+	if (key == MINUS_KEY)
+		p->max_iter -= p->max_iter > 1 ? 1 : 0;
+    render(param);
 	return (1);
 }
 
@@ -66,7 +66,6 @@ int     mouse_press(int button, int x, int y, void *param)
 {
     t_mlx       *mlx;
     t_param     *p;
-    double		zoom;
 
     mlx = (t_mlx*)param;
     p = mlx->img->params;
@@ -78,16 +77,10 @@ int     mouse_press(int button, int x, int y, void *param)
     }
     if (button == SCROLL_UP || button == SCROLL_DOWN)
     {
-    	zoom = 0.0;
         if (button == SCROLL_UP)
-//            zoom += 0.1;
-        	zoom = pow(2.0, -0.1);
+        	p->radius *= pow(2.0, -0.1);
         if (button == SCROLL_DOWN)
-            zoom = pow(2.0, 0.1);
-        p->radius *= zoom;
-        p->center[0] = p->center[0] + p->radius * ((x - WIDTH / 2.0) / HEIGHT / 2.0) * (1 - zoom);
-        p->center[1] = p->center[1] + p->radius * ((y - HEIGHT / 2.0) / HEIGHT / 2.0) * (1 - zoom);
-        printf("x: %f\ty: %fi\n", p->center[0], p->center[1]);
+            p->radius *= pow(2.0, 0.1);
     }
     render(mlx);
     return (1);

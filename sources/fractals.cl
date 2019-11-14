@@ -1,10 +1,9 @@
-kernel void mandelbrot(__global int *data, int size_x, int size_y, double x, double y, double radius)
+kernel void mandelbrot(__global int *data, int size_x, int size_y, double x, double y, double radius, int max_iter)
 {
     int         idx = get_global_id(0);
     double2     z, c;
     double      r2;
     int         color = 0;
-    int         max_iter = 100;
     double      tmp;
     double2     min, max;
 

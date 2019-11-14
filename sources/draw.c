@@ -16,6 +16,7 @@ void	render(t_mlx *mlx)
 {
 	if (run_kernel(mlx))
 		terminate("error with OpenCL kernel\n", &mlx);
+	mlx_pixel_put(mlx->mlx, mlx->win, WIDTH / 2, HEIGHT / 2, 0x0000FF);
 	mlx_clear_window(mlx->mlx, mlx->win);
 	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img->img, 0, 0);
 }

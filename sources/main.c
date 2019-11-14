@@ -20,6 +20,7 @@ void    set_default_view(t_param *p)
     p->click_pos[0] = 0;
     p->click_pos[1] = 0;
     p->is_click = 0;
+    p->max_iter = 50;
 }
 
 t_mlx	*init()
