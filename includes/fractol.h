@@ -89,18 +89,14 @@ void    set_default_view(t_param *p);
 t_kernel    *init_kernel();
 int		    new_kernel(t_mlx *mlx);
 int			run_kernel(t_mlx * mlx);
+void        destroy_kernel(t_kernel **kernel);
 
 /*
  * Additional tools
  */
 char    *read_kernel(char *filename);
-void	terminate(const char *err_mes);
+void	terminate(const char *err_mes, t_mlx **mlx);
 void    render(t_mlx *mlx);
-
-/*
- * Delete it
- */
-void    single_thread(void *data, t_param *box);
 
 /*
  * Debug info

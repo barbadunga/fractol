@@ -4,7 +4,7 @@ kernel void mandelbrot(__global int *data, int size_x, int size_y, double x, dou
     double2     z, c;
     double      r2;
     int         color = 0;
-    int         max_iter = 1000;
+    int         max_iter = 100;
     double      tmp;
     double2     min, max;
 

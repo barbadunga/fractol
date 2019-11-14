@@ -18,7 +18,9 @@ int		close_mlx(void *param)
 	t_mlx	*mlx;
 
 	mlx = param;
-	mlx_destroy_window(mlx->mlx, mlx->win);
+
+	destroy_kernel(&(mlx->kernel));
+	terminate("", &mlx);
 	exit(1);
 }
 
@@ -78,10 +80,14 @@ int     mouse_press(int button, int x, int y, void *param)
     {
     	zoom = 0.0;
         if (button == SCROLL_UP)
-            zoom += 0.1;
+//            zoom += 0.1;
+        	zoom = pow(2.0, -0.1);
         if (button == SCROLL_DOWN)
-            zoom -= 0.1;
-        p->radius *= pow(2.0, -zoom);
+            zoom = pow(2.0, 0.1);
+        p->radius *= zoom;
+        p->center[0] = p->center[0] + p->radius * ((x - WIDTH / 2.0) / HEIGHT / 2.0) * (1 - zoom);
+        p->center[1] = p->center[1] + p->radius * ((y - HEIGHT / 2.0) / HEIGHT / 2.0) * (1 - zoom);
+        printf("x: %f\ty: %fi\n", p->center[0], p->center[1]);
     }
     render(mlx);
     return (1);

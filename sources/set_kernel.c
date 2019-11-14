@@ -16,6 +16,11 @@
 void        destroy_kernel(t_kernel **kernel)
 {
 //    Clean all struct with OpenCL release methods
+	clReleaseKernel((*kernel)->core);
+	clReleaseMemObject((*kernel)->buffer);
+	clReleaseContext((*kernel)->ctx);
+	clReleaseCommandQueue((*kernel)->queue);
+	clReleaseProgram((*kernel)->prog);
     free(*kernel);
     *kernel = NULL;
 }
@@ -35,7 +40,7 @@ t_kernel    *init_kernel()
     get_platform_info(kernel->platform); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);
-    ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device, &ret_num_device);
+    ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_CPU, 1, &kernel->device, &ret_num_device);
     print_device_info(kernel->device); // DELETE
     if (ret != CL_SUCCESS)
         return (NULL);

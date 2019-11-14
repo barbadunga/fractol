@@ -13,9 +13,10 @@
 #include "fractol.h"
 #include <stdio.h>
 
-void	terminate(const char *err_mes)
+void	terminate(const char *err_mes, t_mlx **mlx)
 {
 	ft_putstr(err_mes);
+	free(*mlx);
 	exit(1);
 }
 

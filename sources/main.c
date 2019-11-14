@@ -22,7 +22,6 @@ void    set_default_view(t_param *p)
     p->is_click = 0;
 }
 
-// If fail allocation free all memory
 t_mlx	*init()
 {
 	t_mlx	*mlx;
@@ -51,11 +50,10 @@ int		main(void)
 	t_mlx       *mlx; // allocated
 
 	if (!(mlx = init()))
-		exit(1);
+		terminate("error: can't init\n", &mlx);
 	event_handler(mlx);
 	if (new_kernel(mlx))
-	    terminate("error: kernel setup\n");
-//    single_thread(mlx->data, mlx->img->params);
+	    terminate("error: kernel setup\n", &mlx);
     render(mlx);
 	mlx_loop(mlx->mlx);
 	return (0);
