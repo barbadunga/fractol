@@ -8,8 +8,15 @@ kernel void mandelbrot(__global int *data, int size_x, int size_y, double x, dou
     double2     min, max;
 
     c.x = x + radius * ((double)(idx % size_x) - size_x / 2.0) / (size_y / 2.0);
-    c.y = y + radius * ((double)(idx / size_y) - size_y / 2.0) / (size_y / 2.0);
+    c.y = y - radius * ((double)(idx / size_y) - size_y / 2.0) / (size_y / 2.0);
     z.xy = (double2)(0.0, 0.0);
+    double  otr = 0.01 * radius;
+    if ((c.x >= x - otr && c.x <= x + otr) && (c.y <= y + otr && c.y >= y - otr))
+    {
+        data[idx] = 0xFF0000;
+        return ;
+    }
+    if ((c.x >= x - radius && c.x <= x + radius) && (c.y <= y + radius && c.y >= y - radius)) // only radius
     for (int i = 0; i < max_iter; i++)
     {
         r2 = z.x * z.x + z.y * z.y;

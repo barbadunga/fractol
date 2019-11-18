@@ -109,7 +109,7 @@ int	run_kernel(t_mlx *mlx)
 		return (1);
 	if (clSetKernelArg(krnl->core, 6, sizeof(int), &(p->max_iter)))
 		return (1);
-	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL))
+	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL)) // segfault
 		return (1);
 	clFinish(krnl->queue);
 	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL))

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "fractol.h"
+#include <stdio.h>
 
 void    set_default_view(t_param *p)
 {
@@ -52,6 +53,7 @@ int		main(void)
 
 	if (!(mlx = init()))
 		terminate("error: can't init\n", &mlx);
+	printf("%p\n", mlx->mlx);
 	event_handler(mlx);
 	if (new_kernel(mlx))
 	    terminate("error: kernel setup\n", &mlx);

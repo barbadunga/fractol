@@ -22,8 +22,8 @@
 /*
  * Screen settings
  */
-# define WIDTH          1200
-# define HEIGHT         1200
+# define WIDTH          900
+# define HEIGHT         900
 
 /*
  * Control keys MacOs
@@ -67,7 +67,6 @@ typedef struct	s_img
 {
     t_param	*params;
 	void	*img;
-	char	*data;
 	int		bpp;
 	int		size_line;
 	int		end;

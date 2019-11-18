@@ -20,6 +20,8 @@ int		close_mlx(void *param)
 	mlx = param;
 
 	destroy_kernel(&(mlx->kernel));
+	mlx_destroy_image(mlx->mlx, mlx->img);
+	mlx_destroy_window(mlx->mlx, mlx->win);
 	terminate("", &mlx);
 	exit(1);
 }
@@ -27,13 +29,13 @@ int		close_mlx(void *param)
 void    move(int key, t_param *p)
 {
     if (key == LEFT)
-        p->center[0] -= 0.1;
+        p->center[0] -= 0.1 * p->radius;
     if (key == RIGHT)
-        p->center[0] += 0.1;
+        p->center[0] += 0.1 * p->radius;
     if (key == UP)
-        p->center[1] -= 0.1;
+        p->center[1] += 0.1 * p->radius;
     if (key == DOWN)
-        p->center[1] += 0.1;
+        p->center[1] -= 0.1 * p->radius;
 }
 
 void    show()
@@ -62,6 +64,16 @@ int		keyboard_event(int key, void *param)
 	return (1);
 }
 
+double	*screen_to_world(int x, int y, t_param *p)
+{
+	double	*coord;
+
+	coord = (double*)malloc(sizeof(double) * 2);
+	coord[0] = p->center[0] + p->radius * (x - WIDTH / 2.0) / HEIGHT / 2.0;
+	coord[1] = p->center[1] - p->radius * (y - HEIGHT / 2.0) / HEIGHT / 2.0;
+	return (coord);
+}
+
 int     mouse_press(int button, int x, int y, void *param)
 {
     t_mlx       *mlx;
@@ -77,11 +89,14 @@ int     mouse_press(int button, int x, int y, void *param)
     }
     if (button == SCROLL_UP || button == SCROLL_DOWN)
     {
+    	double	old = p->radius;
         if (button == SCROLL_UP)
-        	p->radius *= pow(2.0, -0.1);
-        if (button == SCROLL_DOWN)
-            p->radius *= pow(2.0, 0.1);
-    }
+			p->radius *= pow(2.0, -0.1);
+		if (button == SCROLL_DOWN)
+			p->radius *= pow(2.0, 0.1);
+		p->center[0] = p->center[0] + (x - WIDTH / 2) / (HEIGHT / 2.0) * (old - p->radius);
+		p->center[1] = p->center[1] - (y - HEIGHT / 2) / (HEIGHT / 2.0) * (old - p->radius);
+	}
     render(mlx);
     return (1);
 }
@@ -110,7 +125,7 @@ int     mouse_move(int x, int y, void *param)
     if (p->is_click)
     {
         p->center[0] -= (double)(x - p->click_pos[0]) / WIDTH * p->radius * speed;
-        p->center[1] -= (double)(y - p->click_pos[1]) / HEIGHT * p->radius * speed;
+        p->center[1] += (double)(y - p->click_pos[1]) / HEIGHT * p->radius * speed;
         p->click_pos[0] = x;
         p->click_pos[1] = y;
     }
