@@ -39,6 +39,7 @@
 # define ESC            53
 # define D_KEY          2
 # define C_KEY          8
+# define H_KEY			4
 # define S_KEY          1
 # define PLUS_KEY       24
 # define MINUS_KEY      27
@@ -56,6 +57,7 @@ typedef struct	s_kernel
 
 typedef struct  s_param
 {
+	char	*name;
     double  center[2];
     int     click_pos[2];
     double  radius;
@@ -66,37 +68,37 @@ typedef struct  s_param
 typedef struct	s_img
 {
     t_param	*params;
-	void	*img;
+	void	*img_ptr;
 	int		bpp;
 	int		size_line;
 	int		end;
 }				t_img;
 
-typedef struct s_mlx
+typedef struct s_mngr
 {
 	void		*win;
 	void		*mlx;
 	t_img		*img;
 	char		*data;
 	t_kernel	*kernel;
-}				t_mlx;
+}				t_mngr;
 
-void	event_handler(t_mlx *mlx);
+void	event_handler(t_mngr *mngr);
 void    set_default_view(t_param *p);
 /*
  * OpenCL kernel setup functions
  */
 t_kernel    *init_kernel();
-int		    new_kernel(t_mlx *mlx);
-int			run_kernel(t_mlx * mlx);
-void        destroy_kernel(t_kernel **kernel);
+int		    new_kernel(t_mngr *mngr);
+int			run_kernel(t_mngr * mngr);
+void        destroy_kernel(t_kernel *kernel);
 
 /*
  * Additional tools
  */
 char    *read_kernel(char *filename);
-void	terminate(const char *err_mes, t_mlx **mlx);
-void    render(t_mlx *mlx);
+void	terminate(const char *err_mes, t_mngr *mngr);
+void    render(t_mngr *mngr);
 
 /*
  * Debug info

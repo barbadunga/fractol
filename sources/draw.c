@@ -12,10 +12,13 @@
 
 #include "fractol.h"
 
-void	render(t_mlx *mlx)
+void	render(t_mngr *mngr)
 {
-	if (run_kernel(mlx))
-		terminate("error with OpenCL kernel\n", &mlx);
-	mlx_clear_window(mlx->mlx, mlx->win);
-	mlx_put_image_to_window(mlx->mlx, mlx->win, mlx->img->img, 0, 0);
+	if (run_kernel(mngr))
+	{
+		destroy_kernel(mngr->kernel);
+		terminate("error with OpenCL kernel\n", mngr);
+	}
+	mlx_clear_window(mngr->mlx, mngr->win);
+	mlx_put_image_to_window(mngr->mlx, mngr->win, mngr->img->img_ptr, WIDTH - HEIGHT, 0);
 }

@@ -13,11 +13,36 @@
 #include "fractol.h"
 #include <stdio.h>
 
-void	terminate(const char *err_mes, t_mlx **mlx)
+void	terminate(const char *err_mes, t_mngr *mngr)
 {
 	ft_putstr(err_mes);
-	free(*mlx);
+	if (mngr)
+	{
+		if (mngr->kernel)
+			destroy_kernel(mngr->kernel);
+		mlx_destroy_image(mngr->mlx, mngr->img->img_ptr);
+		mlx_destroy_window(mngr->mlx, mngr->win);
+		free(mngr->img->params);
+		free(mngr->img);
+		free(mngr);
+	}
 	exit(1);
+}
+
+void        destroy_kernel(t_kernel *kernel)
+{
+	if (kernel->core)
+		clReleaseKernel(kernel->core);
+	if (kernel->buffer)
+		clReleaseMemObject(kernel->buffer);
+	if (kernel->ctx)
+		clReleaseContext(kernel->ctx);
+	if (kernel->queue)
+		clReleaseCommandQueue(kernel->queue);
+	if (kernel->prog)
+		clReleaseProgram(kernel->prog);
+	free(kernel);
+	kernel = NULL;
 }
 
 char *read_kernel(char *filename)
@@ -40,5 +65,7 @@ char *read_kernel(char *filename)
         return (NULL); // free vec before
     ft_strncpy(kernel, vec->data, vec->total + 1);
     ft_vec_del(&vec);
+    if (close(fd) < 0)
+		return (NULL);
     return (kernel);
 }

@@ -11,18 +11,6 @@
 /* ************************************************************************** */
 
 #include "fractol.h"
-#include <stdio.h>
-
-void        destroy_kernel(t_kernel **kernel)
-{
-	clReleaseKernel((*kernel)->core);
-	clReleaseMemObject((*kernel)->buffer);
-	clReleaseContext((*kernel)->ctx);
-	clReleaseCommandQueue((*kernel)->queue);
-	clReleaseProgram((*kernel)->prog);
-    free(*kernel);
-    *kernel = NULL;
-}
 
 t_kernel    *init_kernel()
 {
@@ -33,16 +21,16 @@ t_kernel    *init_kernel()
 
     if (!(kernel = (t_kernel*)malloc(sizeof(kernel))))
         return (NULL);
+    kernel->buffer = NULL;
+    kernel->core = NULL;
     kernel->ctx = NULL;
+    kernel->queue = NULL;
     kernel->prog = NULL;
-    ret = clGetPlatformIDs(1, &kernel->platform, &ret_num_platforms);
-    get_platform_info(kernel->platform); // DELETE
-    if (ret != CL_SUCCESS)
-        return (NULL);
-    ret = clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device, &ret_num_device);
-    print_device_info(kernel->device); // DELETE
-    if (ret != CL_SUCCESS)
-        return (NULL);
+    if (clGetPlatformIDs(1, &kernel->platform, &ret_num_platforms))
+    	return (NULL);
+    if (clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device,
+    		&ret_num_device))
+		return (NULL);
     kernel->ctx = clCreateContext(0, 1, &kernel->device, NULL, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (NULL);
@@ -52,7 +40,7 @@ t_kernel    *init_kernel()
     return (kernel);
 }
 
-int load_kernel(t_kernel *kernel)
+int load_kernel(t_kernel *kernel, char *name)
 {
     char    *source;
     size_t  len;
@@ -61,19 +49,19 @@ int load_kernel(t_kernel *kernel)
     if (!(source = read_kernel("./sources/fractals.cl")))
         return (1);
     len = ft_strlen(source);
-    kernel->prog = clCreateProgramWithSource(kernel->ctx, 1, (const char **)&source, &len, &ret);
+    kernel->prog = clCreateProgramWithSource(kernel->ctx, 1,
+    		(const char **)&source, &len, &ret);
+	ft_strdel(&source);
     if (ret != CL_SUCCESS)
         return (1);
-    ft_strdel(&source);
-    ret = clBuildProgram(kernel->prog, 1, &kernel->device, NULL, NULL, NULL);
-    if (ret != CL_SUCCESS) {
+    if (clBuildProgram(kernel->prog, 1, &kernel->device, NULL, NULL, NULL))
+    {
         get_build_log(kernel->prog, kernel->device, ret);
         return (1);
     }
-    kernel->core = clCreateKernel(kernel->prog, "mandelbrot", &ret);
-    if (ret != CL_SUCCESS) {
+    kernel->core = clCreateKernel(kernel->prog, name, &ret); // segfault
+    if (ret != CL_SUCCESS)
         return (1);
-    }
     return (0);
 }
 
@@ -95,11 +83,11 @@ int set_args_kernel(t_kernel *krnl)
     return (0);
 }
 
-int	run_kernel(t_mlx *mlx)
+int	run_kernel(t_mngr *mngr)
 {
-	const size_t	global_work_size = HEIGHT * WIDTH;
-	const t_param	*p = mlx->img->params;
-	const t_kernel	*krnl = mlx->kernel;
+	static const size_t	global_work_size = HEIGHT * WIDTH;
+	const t_param		*p = mngr->img->params;
+	const t_kernel		*krnl = mngr->kernel;
 
 	if (clSetKernelArg(krnl->core, 3, sizeof(double), &(p->center[0])))
 		return (1);
@@ -112,22 +100,20 @@ int	run_kernel(t_mlx *mlx)
 	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL)) // segfault
 		return (1);
 	clFinish(krnl->queue);
-	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mlx->data, 0, NULL, NULL))
+	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, mngr->data, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
 	return (0);
 }
 
-int new_kernel(t_mlx *mlx) {
-    t_kernel *kernel;
+int new_kernel(t_mngr *mngr)
+{
+	t_kernel	*kernel;
 
     if (!(kernel = init_kernel()))
-        return (1);
-    if (load_kernel(kernel) || set_args_kernel(kernel))
-	{
-    	destroy_kernel(&kernel);
-    	return (1);
-	}
-    mlx->kernel = kernel;
+		return (1);
+    if (load_kernel(kernel, mngr->img->params->name) || set_args_kernel(kernel))
+		return (1);
+    mngr->kernel = kernel;
     return (0);
 }
