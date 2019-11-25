@@ -33,11 +33,16 @@
 # define D_KEY          2
 # define C_KEY          8
 # define S_KEY          1
+# define CTRL_KEY		256
 # define PLUS_KEY       24
 # define MINUS_KEY      27
 
+/*
+ * Program params
+ */
 # define HEIGHT			900
 # define WIDTH			900
+# define M_SPEED	1.5
 # define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia"
 
 typedef struct	s_kernel
@@ -54,10 +59,12 @@ typedef struct	s_kernel
 typedef	struct	s_view
 {
 	double			center[2];
+	double			cnst[2];
 	int				click[2];
 	double			radius;
 	unsigned int	max_iter;
-	char			is_click;
+	int				pressed;
+	double			angle;
 }				t_view;
 
 typedef struct	s_img
@@ -83,7 +90,7 @@ typedef struct s_fctl
 /*
  * Init funcs
  */
-int		init_fractol(t_fctl *fctl, char	*name);
+int		init_fractol(t_fctl **fctl, char	*name);
 void	set_default_view(t_view *view, char name);
 int		new_kernel(t_fctl *fctl);
 
@@ -102,7 +109,7 @@ void	event_handler(t_fctl *fctl);
 /*
  * Main funcs
  */
-void	render(t_fctl *f);
+int 	render(t_fctl *f);
 
 /*
  * OpenCL functions
@@ -110,5 +117,10 @@ void	render(t_fctl *f);
 int		run_kernel(t_fctl *fctl);
 
 
-void	single_thread(void *data, t_view *v);
+/*
+ * Debug funcs
+ */
+
+void    get_build_log(cl_program prog, cl_device_id id, cl_int errno);
+
 #endif

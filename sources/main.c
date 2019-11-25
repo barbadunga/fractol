@@ -20,11 +20,10 @@ int main(int argc, char **argv)
 		terminate(USAGE, NULL);
 	if (!(fctl = (t_fctl*)malloc(sizeof(t_fctl))))
 		terminate("error: malloc failure", NULL);
-	if (!init_fractol(fctl, argv[1]))
+	if (!init_fractol(&fctl, argv[1]))
 		terminate("error: init failure", &fctl);
 	if (new_kernel(fctl))
 		terminate("error: OpenCL failure", &fctl);
-	render(fctl);
 	event_handler(fctl);
 	mlx_loop(fctl->mlx);
 	return (1);

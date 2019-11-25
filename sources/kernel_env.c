@@ -19,7 +19,7 @@ t_kernel    *init_kernel()
     cl_uint         ret_num_platforms;
     cl_uint         ret_num_device;
 
-    if (!(kernel = (t_kernel*)malloc(sizeof(kernel))))
+    if (!(kernel = (t_kernel*)malloc(sizeof(t_kernel))))
         return (NULL);
     kernel->buffer = NULL;
     kernel->core = NULL;
@@ -56,7 +56,7 @@ int load_kernel(t_kernel *kernel, char *name)
         return (1);
     if (clBuildProgram(kernel->prog, 1, &kernel->device, NULL, NULL, NULL))
     {
-//        get_build_log(kernel->prog, kernel->device, ret);
+        get_build_log(kernel->prog, kernel->device, ret);
         return (1);
     }
     kernel->core = clCreateKernel(kernel->prog, name, &ret); // segfault
@@ -68,17 +68,14 @@ int load_kernel(t_kernel *kernel, char *name)
 int set_args_kernel(t_kernel *krnl)
 {
     int         ret;
-	const int	size_x = WIDTH;
-	const int	size_y = HEIGHT;
+	const int	size[2] = {WIDTH, HEIGHT};
 
     krnl->buffer = clCreateBuffer(krnl->ctx, CL_MEM_WRITE_ONLY, sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (1);
     if ((ret = clSetKernelArg(krnl->core, 0, sizeof(cl_mem), &krnl->buffer)))
     	return (1);
-	if ((ret = clSetKernelArg(krnl->core, 1, sizeof(int), &size_x)))
-		return (1);
-	if ((ret = clSetKernelArg(krnl->core, 2, sizeof(int), &size_y)))
+	if ((ret = clSetKernelArg(krnl->core, 1, sizeof(cl_int2), &size)))
 		return (1);
     return (0);
 }
@@ -89,13 +86,13 @@ int	run_kernel(t_fctl *fctl)
 	const t_view		*v = fctl->img->view;
 	const t_kernel		*krnl = fctl->kernel;
 
-	if (clSetKernelArg(krnl->core, 3, sizeof(double), &(v->center[0])))
+	if (clSetKernelArg(krnl->core, 2, sizeof(cl_double2), &(v->center)))
 		return (1);
-	if (clSetKernelArg(krnl->core, 4, sizeof(double), &(v->center[1])))
+	if (clSetKernelArg(krnl->core, 3, sizeof(double), &(v->radius)))
 		return (1);
-	if (clSetKernelArg(krnl->core, 5, sizeof(double), &(v->radius)))
+	if (clSetKernelArg(krnl->core, 4, sizeof(int), &(v->max_iter)))
 		return (1);
-	if (clSetKernelArg(krnl->core, 6, sizeof(int), &(v->max_iter)))
+	if (clSetKernelArg(krnl->core, 5, sizeof(cl_double2), &(v->cnst)))
 		return (1);
 	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL)) // segfault
 		return (1);
