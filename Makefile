@@ -31,6 +31,8 @@ SRC_LST =	main.c \
             render.c \
             kernel_env.c \
             debug.c \
+            mouse.c \
+            keyboard.c \
 
 OBJ_LST = $(patsubst %.c, %.o, $(SRC_LST))
 

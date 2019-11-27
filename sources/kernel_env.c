@@ -12,6 +12,7 @@
 
 #include "fractol.h"
 
+// Need to free if malloc allocation failure
 t_kernel    *init_kernel()
 {
     t_kernel        *kernel;
@@ -59,7 +60,7 @@ int load_kernel(t_kernel *kernel, char *name)
         get_build_log(kernel->prog, kernel->device, ret);
         return (1);
     }
-    kernel->core = clCreateKernel(kernel->prog, name, &ret); // segfault
+    kernel->core = clCreateKernel(kernel->prog, name, &ret);
     if (ret != CL_SUCCESS)
         return (1);
     return (0);
@@ -92,9 +93,9 @@ int	run_kernel(t_fctl *fctl)
 		return (1);
 	if (clSetKernelArg(krnl->core, 4, sizeof(int), &(v->max_iter)))
 		return (1);
-	if (clSetKernelArg(krnl->core, 5, sizeof(cl_double2), &(v->cnst)))
+	if (clSetKernelArg(krnl->core, 5, sizeof(cl_double2), &(v->constant)))
 		return (1);
-	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL)) // segfault
+	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
 	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, fctl->img->data, 0, NULL, NULL))

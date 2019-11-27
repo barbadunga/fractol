@@ -20,8 +20,8 @@ void	set_default_view(t_view *v, char name)
 		v->center[0] = 0.0;
 		v->center[1] = 0.0;
 		v->radius = 2.0;
-		v->cnst[0] = -0.7;
-		v->cnst[1] = 0.27015;
+		v->constant[0] = -0.7;
+		v->constant[1] = 0.27015;
 	}
 	else
 	{

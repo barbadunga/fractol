@@ -33,6 +33,9 @@
 # define D_KEY          2
 # define C_KEY          8
 # define S_KEY          1
+# define L_SHIFT		43
+# define R_SHIFT		47
+# define H_KEY			4
 # define CTRL_KEY		256
 # define PLUS_KEY       24
 # define MINUS_KEY      27
@@ -42,7 +45,7 @@
  */
 # define HEIGHT			900
 # define WIDTH			900
-# define M_SPEED	1.5
+# define M_SPEED		1.5
 # define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia"
 
 typedef struct	s_kernel
@@ -59,7 +62,7 @@ typedef struct	s_kernel
 typedef	struct	s_view
 {
 	double			center[2];
-	double			cnst[2];
+	double			constant[2];
 	int				click[2];
 	double			radius;
 	unsigned int	max_iter;
@@ -90,37 +93,40 @@ typedef struct s_fctl
 /*
  * Init funcs
  */
-int		init_fractol(t_fctl **fctl, char	*name);
-void	set_default_view(t_view *view, char name);
-int		new_kernel(t_fctl *fctl);
+int				init_fractol(t_fctl **fctl, char	*name);
+void			set_default_view(t_view *view, char name);
+int				new_kernel(t_fctl *fctl);
 
 /*
  * Util funcs
  */
-void	terminate(char *err, t_fctl **fractol);
-void	destroy_kernel(t_kernel *kernel);
-char	*read_kernel(char *filename);
-
-/*
- * Event handler
- */
-void	event_handler(t_fctl *fctl);
+void			terminate(char *err, t_fctl **fractol);
+void			destroy_kernel(t_kernel *kernel);
+char			*read_kernel(char *filename);
 
 /*
  * Main funcs
  */
-int 	render(t_fctl *f);
-
-/*
- * OpenCL functions
- */
-int		run_kernel(t_fctl *fctl);
-
+int				render(t_fctl *f);
+void			event_handler(t_fctl *fctl);
+int				run_kernel(t_fctl *fctl);
 
 /*
  * Debug funcs
  */
+void			get_build_log(cl_program prog, cl_device_id id, cl_int errno);
+void			print_device_info(cl_device_id id);
+void			get_platform_info(cl_platform_id id);
+cl_device_id	get_device_info(cl_platform_id id, cl_device_info value_name);
 
-void    get_build_log(cl_program prog, cl_device_id id, cl_int errno);
-
+/*
+ * Controls
+ */
+int				keyboard_event(int key, void *param);
+int				keyboard_release(int key, void *param);
+int				mouse_press(int button, int x, int y, void *param);
+int				mouse_release(int button, int x, int y, void *param);
+int				mouse_move(int x, int y, void *param);
+int				close_window(void *param);
+void			move(int key, t_view *p);
 #endif
