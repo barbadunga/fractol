@@ -39,6 +39,7 @@ void	terminate(char	*err, t_fctl **fractol)
 	exit(err ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
+// Hello motherfucker
 void	destroy_kernel(t_kernel *kernel)
 {
 	kernel = NULL;
@@ -67,4 +68,14 @@ char *read_kernel(char *filename)
 	if (close(fd) < 0)
 		return (NULL);
 	return (kernel);
+}
+
+void	fill(void *data, int x, int y, int w, int h, int color)
+{
+	(void)data;
+	(void)x;
+	(void)y;
+	(void)w;
+	(void)h;
+	(void)color;
 }

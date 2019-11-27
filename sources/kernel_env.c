@@ -13,7 +13,7 @@
 #include "fractol.h"
 
 // Need to free if malloc allocation failure
-t_kernel    *init_kernel()
+t_kernel    *init_kernel(void)
 {
     t_kernel        *kernel;
     int             ret;
@@ -71,7 +71,8 @@ int set_args_kernel(t_kernel *krnl)
     int         ret;
 	const int	size[2] = {WIDTH, HEIGHT};
 
-    krnl->buffer = clCreateBuffer(krnl->ctx, CL_MEM_WRITE_ONLY, sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
+    krnl->buffer = clCreateBuffer(krnl->ctx, CL_MEM_WRITE_ONLY,
+    		sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (1);
     if ((ret = clSetKernelArg(krnl->core, 0, sizeof(cl_mem), &krnl->buffer)))
@@ -95,7 +96,8 @@ int	run_kernel(t_fctl *fctl)
 		return (1);
 	if (clSetKernelArg(krnl->core, 5, sizeof(cl_double2), &(v->constant)))
 		return (1);
-	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL, &global_work_size, NULL, 0, NULL, NULL))
+	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL,
+			&global_work_size, NULL, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
 	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, fctl->img->data, 0, NULL, NULL))
@@ -104,13 +106,12 @@ int	run_kernel(t_fctl *fctl)
 	return (0);
 }
 
-int new_kernel(t_fctl *fctl)
+int	new_kernel(t_fctl *fctl)
 {
 	t_kernel	*kernel;
-
-    if (!(kernel = init_kernel()))
+	if (!(kernel = init_kernel()))
 		return (1);
-    if (load_kernel(kernel, fctl->name) || set_args_kernel(kernel))
+	if (load_kernel(kernel, fctl->name) || set_args_kernel(kernel))
 		return (1);
     fctl->kernel = kernel;
     return (0);

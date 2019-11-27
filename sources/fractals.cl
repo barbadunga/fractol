@@ -9,6 +9,14 @@ int     colorize(int i, int max)
     return (red << 16 | green << 8 | blue);
 }
 
+int         coloring(double t)
+{
+    int red = (int)(9 * (1 - t) * pow(t, 3) * 255);
+    int green = (int)(15 * pow((1 - t), 2) * pow(t, 2) * 255);
+    int blue = (int)(8.5 * pow((1 - t), 3) * t * 255);
+    return (red << 16 | green << 8 | blue);
+}
+
 double2     transform(int idx, double2 c, double r, int2 s)
 {
     double2 complex;
@@ -40,11 +48,11 @@ double2     cadd(double2 z1, double2 z2)
 kernel void mandelbrot(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j)
 {
     int         idx = get_global_id(0);
-    double2     z, c, v, u, der;
+    double2     z, c, v, u, der, tmp;
     double      h2 = 1.5;
     int         reason;
     double      r2;
-    int         color = 0;
+    int         color = 0xFF;
 
     c = transform(idx, center, radius, size);
     z.xy = (double2)(0.0, 0.0);
@@ -54,18 +62,18 @@ kernel void mandelbrot(__global int *data, int2 size, double2 center, double rad
     for (int i = 0; i < max_iter; i++)
     {
         r2 = cmod(z);
-        if (r2 > 4)
+        if (r2 > 10000)
         {
-            color = colorize(i, max_iter);
+            // color = colorize(i, max_iter);
             reason = 1;
             break;
         }
+        tmp = z;
         z = cmul(z, z);
         z = cadd(z, c);
-        der = cmul(der, (double2)(2.0 * z.x, 2.0 * z.y));
+        der = cmul(der, (double2)(2.0 * tmp.x, 2.0 * tmp.y));
         der = cadd(der, (double2)(1.0, 0.0));
     }
-    /*
     if (reason)
     {
         u = (double2)(z.x / der.x, z.y / der.y);
@@ -76,7 +84,6 @@ kernel void mandelbrot(__global int *data, int2 size, double2 center, double rad
             t = 0;
         color = 0xFAFAFA * t * 0x00010101;
     }
-    */
     data[idx] = color;
 }
 

@@ -29,6 +29,8 @@ int		keyboard_event(int key, void *param)
 		v->max_iter -= v->max_iter > 1 ? 1 : 0;
 	if (key == CTRL_KEY)
 		v->pressed = CTRL_KEY;
+	if (key == H_KEY)
+		v->help = v->help ? 0 : 1;
 	render((t_fctl*)param);
 	return (1);
 }

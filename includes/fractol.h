@@ -68,6 +68,7 @@ typedef	struct	s_view
 	unsigned int	max_iter;
 	int				pressed;
 	double			angle;
+	int				help;
 }				t_view;
 
 typedef struct	s_img
@@ -103,6 +104,7 @@ int				new_kernel(t_fctl *fctl);
 void			terminate(char *err, t_fctl **fractol);
 void			destroy_kernel(t_kernel *kernel);
 char			*read_kernel(char *filename);
+void	fill(void *data, int x, int y, int w, int h, int color);
 
 /*
  * Main funcs

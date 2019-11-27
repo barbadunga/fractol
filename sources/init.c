@@ -34,6 +34,7 @@ void	set_default_view(t_view *v, char name)
 	v->click[1]= -1;
 	v->pressed = -1;
 	v->angle = 2.346;
+	v->help = 0;
 }
 
 int		init_fractol(t_fctl **fctl, char *type)
