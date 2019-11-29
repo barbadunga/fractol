@@ -70,12 +70,21 @@ char *read_kernel(char *filename)
 	return (kernel);
 }
 
-void	fill(void *data, int x, int y, int w, int h, int color)
+void	fill(int *data, int x, int y, int width, int height, int color)
 {
-	(void)data;
-	(void)x;
-	(void)y;
-	(void)w;
-	(void)h;
-	(void)color;
+	int		start;
+
+	start = x;
+	width += x;
+	height += y;
+	while (y < height && y < HEIGHT)
+	{
+		x = start;
+		while (x < width && x < WIDTH)
+		{
+			data[y * WIDTH + x] = color;
+			x += 2;
+		}
+		y += 2;
+	}
 }

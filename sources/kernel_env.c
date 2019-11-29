@@ -29,7 +29,7 @@ t_kernel    *init_kernel(void)
     kernel->prog = NULL;
     if (clGetPlatformIDs(1, &kernel->platform, &ret_num_platforms))
     	return (NULL);
-    if (clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_GPU, 1, &kernel->device,
+    if (clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_CPU, 1, &kernel->device,
     		&ret_num_device))
 		return (NULL);
     kernel->ctx = clCreateContext(0, 1, &kernel->device, NULL, NULL, &ret);

@@ -16,15 +16,19 @@ int 	render(t_fctl *f)
 {
 	if (run_kernel(f))
 		terminate("error with OpenCL kernel", &f);
-	mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);
 	if (f->img->view->help)
 	{
+		fill((int*)(f->img->data), WIDTH / 2 - WIDTH / 5,
+				HEIGHT / 2 - HEIGHT / 5, WIDTH / 3, HEIGHT / 3, 0x0FFFFFF);
+		mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);
 		mlx_string_put(f->mlx, f->win, 5, HEIGHT - 25, 0xFFFFFF,
-				"Press \'H\' to hide help");
-		fill(f->img->data, 0, 2 * HEIGHT / 3, 100, 100, 0xFFFFFF);
+				"Press H to hide help");
 	}
 	else
+	{
+		mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);
 		mlx_string_put(f->mlx, f->win, 5, HEIGHT - 25, 0xFFFFFF,
-				"Press \'H\' to show help");
+				"Press H to show help");
+	}
 	return (1);
 }

@@ -43,8 +43,8 @@
 /*
  * Program params
  */
-# define HEIGHT			900
-# define WIDTH			900
+# define HEIGHT			600
+# define WIDTH			600
 # define M_SPEED		1.5
 # define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia"
 
@@ -104,7 +104,7 @@ int				new_kernel(t_fctl *fctl);
 void			terminate(char *err, t_fctl **fractol);
 void			destroy_kernel(t_kernel *kernel);
 char			*read_kernel(char *filename);
-void	fill(void *data, int x, int y, int w, int h, int color);
+void			fill(int *data, int x, int y, int w, int h, int color);
 
 /*
  * Main funcs
