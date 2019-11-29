@@ -72,6 +72,8 @@ int     mouse_move(int x, int y, void *param)
 	{
 		v->constant[0] = -3 * sqrt((WIDTH / 2 - x) * (WIDTH / 2 - x)) / (WIDTH / 2);
 		v->constant[0] += 3 * sqrt((HEIGHT / 2 - y) * (HEIGHT / 2 - y)) / (HEIGHT / 2);
+		v->constant[1] = 3 * sqrt((WIDTH / 2 - x) * (WIDTH / 2 - x) + (HEIGHT / 2 - y) * (HEIGHT / 2 - y)) / (WIDTH / 2);
+		v->constant[1] += 3 * 3 * sqrt((WIDTH / 2 - x) * (WIDTH / 2 - x) + (HEIGHT / 2 - y) * (HEIGHT / 2 - y)) / (HEIGHT / 2);
 	}
 	render((t_fctl*)param);
 	return (1);

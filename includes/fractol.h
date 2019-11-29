@@ -43,8 +43,8 @@
 /*
  * Program params
  */
-# define HEIGHT			600
-# define WIDTH			600
+# define HEIGHT			900
+# define WIDTH			900
 # define M_SPEED		1.5
 # define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia"
 
@@ -94,9 +94,10 @@ typedef struct s_fctl
 /*
  * Init funcs
  */
-int				init_fractol(t_fctl **fctl, char	*name);
-void			set_default_view(t_view *view, char name);
+int				init_fractol(t_fctl **fctl, char *name);
+void			set_default_view(t_view *view, char *name);
 int				new_kernel(t_fctl *fctl);
+int				check_name(char	*name);
 
 /*
  * Util funcs

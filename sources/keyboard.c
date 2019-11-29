@@ -22,7 +22,7 @@ int		keyboard_event(int key, void *param)
 	if (key == LEFT || key == UP || key == DOWN || key == RIGHT)
 		move(key, v);
 	if (key == D_KEY)
-		set_default_view(v, ((t_fctl*)param)->name[0]);
+		set_default_view(v, ((t_fctl*)param)->name);
 	if (key == PLUS_KEY)
 		v->max_iter++;
 	if (key == MINUS_KEY)

@@ -13,7 +13,7 @@
 #include "fractol.h"
 
 // Need to free if malloc allocation failure
-t_kernel    *init_kernel(void)
+t_kernel    *init_kernel(int type)
 {
     t_kernel        *kernel;
     int             ret;
@@ -29,9 +29,10 @@ t_kernel    *init_kernel(void)
     kernel->prog = NULL;
     if (clGetPlatformIDs(1, &kernel->platform, &ret_num_platforms))
     	return (NULL);
-    if (clGetDeviceIDs(kernel->platform, CL_DEVICE_TYPE_CPU, 1, &kernel->device,
+    if (clGetDeviceIDs(kernel->platform, type, 1, &kernel->device,
     		&ret_num_device))
 		return (NULL);
+    print_device_info(kernel->device);
     kernel->ctx = clCreateContext(0, 1, &kernel->device, NULL, NULL, &ret);
     if (ret != CL_SUCCESS)
         return (NULL);
@@ -109,7 +110,7 @@ int	run_kernel(t_fctl *fctl)
 int	new_kernel(t_fctl *fctl)
 {
 	t_kernel	*kernel;
-	if (!(kernel = init_kernel()))
+	if (!(kernel = init_kernel(CL_DEVICE_TYPE_GPU)))
 		return (1);
 	if (load_kernel(kernel, fctl->name) || set_args_kernel(kernel))
 		return (1);

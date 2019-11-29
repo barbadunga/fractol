@@ -14,13 +14,15 @@
 
 int main(int argc, char **argv)
 {
-	t_fctl	*fctl;
+	t_fctl		*fctl;
+	char		*name;
 
 	if (argc != 2)
 		terminate(USAGE, NULL);
 	if (!(fctl = (t_fctl*)malloc(sizeof(t_fctl))))
 		terminate("error: malloc failure", NULL);
-	if (!init_fractol(&fctl, argv[1]))
+	name = ft_tolowercase(argv[1]);
+	if (!init_fractol(&fctl, name))
 		terminate("error: init failure", &fctl);
 	if (new_kernel(fctl))
 		terminate("error: OpenCL failure", &fctl);

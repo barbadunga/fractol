@@ -39,10 +39,18 @@ void	terminate(char	*err, t_fctl **fractol)
 	exit(err ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
-// Hello motherfucker
-void	destroy_kernel(t_kernel *kernel)
+void        destroy_kernel(t_kernel *kernel)
 {
-	kernel = NULL;
+	if (kernel->core)
+		clReleaseKernel(kernel->core);
+	if (kernel->buffer)
+		clReleaseMemObject(kernel->buffer);
+	if (kernel->ctx)
+		clReleaseContext(kernel->ctx);
+	if (kernel->queue)
+		clReleaseCommandQueue(kernel->queue);
+	if (kernel->prog)
+		clReleaseProgram(kernel->prog);
 }
 
 char *read_kernel(char *filename)
@@ -73,8 +81,11 @@ char *read_kernel(char *filename)
 void	fill(int *data, int x, int y, int width, int height, int color)
 {
 	int		start;
+	int		line;
+	int dat;
 
 	start = x;
+	line = y;
 	width += x;
 	height += y;
 	while (y < height && y < HEIGHT)
@@ -82,9 +93,13 @@ void	fill(int *data, int x, int y, int width, int height, int color)
 		x = start;
 		while (x < width && x < WIDTH)
 		{
-			data[y * WIDTH + x] = color;
-			x += 2;
+			dat = data[y * WIDTH + x];
+			if (y == line || y == height - 1 || x == start || x == width - 1)
+				data[y * WIDTH + x] = 0xC0C0C0;
+			else
+				data[y * WIDTH + x] = (int)((dat) * 0.5); // change on shading the color
+			x++;
 		}
-		y += 2;
+		y++;
 	}
 }

@@ -48,41 +48,22 @@ double2     cadd(double2 z1, double2 z2)
 kernel void mandelbrot(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j)
 {
     int         idx = get_global_id(0);
-    double2     z, c, v, u, der, tmp;
-    double      h2 = 1.5;
-    int         reason;
+    double2     z, c;
     double      r2;
-    int         color = 0xFF;
+    int         color = 0x0;
 
     c = transform(idx, center, radius, size);
     z.xy = (double2)(0.0, 0.0);
-    der = (double2)(1.0, 0.0);
-    reason = 0;
-    v = (double2)(cos(0.7853981633974483), sin(0.7853981633974483));
     for (int i = 0; i < max_iter; i++)
     {
         r2 = cmod(z);
         if (r2 > 10000)
         {
-            // color = colorize(i, max_iter);
-            reason = 1;
+            color = colorize(i, max_iter);
             break;
         }
-        tmp = z;
         z = cmul(z, z);
         z = cadd(z, c);
-        der = cmul(der, (double2)(2.0 * tmp.x, 2.0 * tmp.y));
-        der = cadd(der, (double2)(1.0, 0.0));
-    }
-    if (reason)
-    {
-        u = (double2)(z.x / der.x, z.y / der.y);
-        u = (double2)(u.x / sqrt(u.x * u.x), u.y / sqrt(u.y * u.y));
-        double t = u.x * v.x + u.y * v.y + h2;
-        t = t / (1 + h2);
-        if (t < 0)
-            t = 0;
-        color = 0xFAFAFA * t * 0x00010101;
     }
     data[idx] = color;
 }
@@ -92,7 +73,7 @@ kernel void julia(__global int *data, int2 size, double2 center, double radius, 
     int     idx = get_global_id(0);
     double2 z;
     double  r2;
-    int     color = 0;
+    int     color = 0x0;
 
     z = transform(idx, center, radius, size);
     for (int i = 0; i < max_iter; i++)

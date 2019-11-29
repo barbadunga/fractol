@@ -11,17 +11,18 @@
 /* ************************************************************************** */
 
 #include "fractol.h"
-#include <stdio.h>
 
-void	set_default_view(t_view *v, char name)
+void	set_default_view(t_view *v, char *name)
 {
-	if (name == 'j')
+	if (!ft_strcmp(name, "julia"))
 	{
 		v->center[0] = 0.0;
 		v->center[1] = 0.0;
 		v->radius = 2.0;
 		v->constant[0] = -0.7;
 		v->constant[1] = 0.27015;
+//		v->constant[0] = -1.0;
+//		v->constant[1] = 0.0;
 	}
 	else
 	{
@@ -54,6 +55,6 @@ int		init_fractol(t_fctl **fctl, char *type)
 	(*fctl)->img->data = mlx_get_data_addr((*fctl)->img->img_ptr, &(*fctl)->img->bpp,
 			&(*fctl)->img->size_line, &(*fctl)->img->end);
 	(*fctl)->name = type;
-	set_default_view((*fctl)->img->view, (*fctl)->name[0]);
+	set_default_view((*fctl)->img->view, (*fctl)->name);
 	return (1);
 }
