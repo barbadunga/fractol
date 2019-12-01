@@ -97,7 +97,7 @@ void	fill(int *data, int x, int y, int width, int height, int color)
 			if (y == line || y == height - 1 || x == start || x == width - 1)
 				data[y * WIDTH + x] = 0xC0C0C0;
 			else
-				data[y * WIDTH + x] = (int)((dat) * 0.5); // change on shading the color
+				data[y * WIDTH + x] = color; // change on shading the color
 			x++;
 		}
 		y++;

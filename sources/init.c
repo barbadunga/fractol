@@ -30,11 +30,13 @@ void	set_default_view(t_view *v, char *name)
 		v->center[0] = -0.5;
 		v->center[1] = 0.0;
 	}
-	v->max_iter = 50;
+	v->max_iter = 500;
 	v->click[0] = -1;
 	v->click[1]= -1;
 	v->pressed = -1;
-	v->angle = 2.346;
+	v->rgb[0] = 0.0;
+	v->rgb[1] = 0.6;
+	v->rgb[2] = 1.0;
 	v->help = 0;
 }
 

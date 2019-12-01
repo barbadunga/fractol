@@ -41,6 +41,16 @@
 # define MINUS_KEY      27
 
 /*
+ * Colors ARGB
+ */
+# define BLACK			0x0
+# define RED			0x0000FF
+# define GREEN			0x00FF
+# define BLUE			0xFF
+# define WHITE			0xFFFFFF
+# define SILVER			0xC0C0C0
+
+/*
  * Program params
  */
 # define HEIGHT			900
@@ -63,11 +73,11 @@ typedef	struct	s_view
 {
 	double			center[2];
 	double			constant[2];
+	double			rgb[3];
 	int				click[2];
 	double			radius;
 	unsigned int	max_iter;
 	int				pressed;
-	double			angle;
 	int				help;
 }				t_view;
 
@@ -132,4 +142,5 @@ int				mouse_release(int button, int x, int y, void *param);
 int				mouse_move(int x, int y, void *param);
 int				close_window(void *param);
 void			move(int key, t_view *p);
+
 #endif

@@ -97,6 +97,8 @@ int	run_kernel(t_fctl *fctl)
 		return (1);
 	if (clSetKernelArg(krnl->core, 5, sizeof(cl_double2), &(v->constant)))
 		return (1);
+	if (clSetKernelArg(krnl->core, 6, sizeof(cl_double3), &(v->rgb)))
+		return (1);
 	if (clEnqueueNDRangeKernel(krnl->queue, krnl->core, 1, NULL,
 			&global_work_size, NULL, 0, NULL, NULL))
 		return (1);

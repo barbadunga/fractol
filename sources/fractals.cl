@@ -1,20 +1,11 @@
-int     colorize(int i, int max)
+int         colorize(double3 rgb, double index)
 {
-    double  t;
+    char3 c;
 
-    t = (double)i / max;
-    int red = (int)(9 * (1 - t) * pow(t, 3) * 255);
-    int green = (int)(15 * pow((1 - t), 2) * pow(t, 2) * 255);
-    int blue = (int)(8.5 * pow((1 - t), 3) * t * 255);
-    return (red << 16 | green << 8 | blue);
-}
-
-int         coloring(double t)
-{
-    int red = (int)(9 * (1 - t) * pow(t, 3) * 255);
-    int green = (int)(15 * pow((1 - t), 2) * pow(t, 2) * 255);
-    int blue = (int)(8.5 * pow((1 - t), 3) * t * 255);
-    return (red << 16 | green << 8 | blue);
+   c.x = (char)(cos(0.015 * index + 3.0 + rgb.x) * 127.5 + 127.5);
+   c.y = (char)(cos(0.015 * index + 3.0 + rgb.y) * 127.5 + 127.5);
+   c.z = (char)(cos(0.015 * index + 3.0 + rgb.z) * 127.5 + 127.5);
+   return ((unsigned char)c.x << 16 | (unsigned char)c.y << 8 | (unsigned char)c.z);
 }
 
 double2     transform(int idx, double2 c, double r, int2 s)
@@ -45,11 +36,11 @@ double2     cadd(double2 z1, double2 z2)
     return ((double2)(z1.x + z2.x, z1.y + z2.y));
 }
 
-kernel void mandelbrot(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j)
+kernel void mandelbrot(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j, double3 pal)
 {
     int         idx = get_global_id(0);
     double2     z, c;
-    double      r2;
+    double      r2, index;
     int         color = 0x0;
 
     c = transform(idx, center, radius, size);
@@ -57,9 +48,10 @@ kernel void mandelbrot(__global int *data, int2 size, double2 center, double rad
     for (int i = 0; i < max_iter; i++)
     {
         r2 = cmod(z);
-        if (r2 > 10000)
+        if (r2 > 4)
         {
-            color = colorize(i, max_iter);
+            index = i - log(log(r2)) + 4;
+            color = colorize(pal, index);
             break;
         }
         z = cmul(z, z);
@@ -68,12 +60,13 @@ kernel void mandelbrot(__global int *data, int2 size, double2 center, double rad
     data[idx] = color;
 }
 
-kernel void julia(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c)
+kernel void julia(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c, double3 pal)
 {
     int     idx = get_global_id(0);
+    double  index, r2;
     double2 z;
-    double  r2;
     int     color = 0x0;
+    char3        rgb;
 
     z = transform(idx, center, radius, size);
     for (int i = 0; i < max_iter; i++)
@@ -83,7 +76,8 @@ kernel void julia(__global int *data, int2 size, double2 center, double radius, 
         r2 = cmod(z);
         if (r2 > 4)
         {
-            color = colorize(i, max_iter);
+            index = i - log(log(r2)) + 4;
+            color = colorize(pal, index);
             break;
         }
     }
