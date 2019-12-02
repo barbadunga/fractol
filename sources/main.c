@@ -24,7 +24,7 @@ int main(int argc, char **argv)
 	name = ft_tolowercase(argv[1]);
 	if (!init_fractol(&fctl, name))
 		terminate("error: init failure", &fctl);
-	if (new_kernel(fctl))
+	if (new_kernel(fctl, CL_DEVICE_TYPE_GPU))
 		terminate("error: OpenCL failure", &fctl);
 	event_handler(fctl);
 	mlx_loop(fctl->mlx);

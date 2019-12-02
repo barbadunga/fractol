@@ -12,78 +12,77 @@
 
 #include "fractol.h"
 
-// Need to free if malloc allocation failure
-t_kernel    *init_kernel(int type)
+t_kernel	*init_kernel(t_kernel **kernel, int type)
 {
-    t_kernel        *kernel;
-    int             ret;
-    cl_uint         ret_num_platforms;
-    cl_uint         ret_num_device;
+	int		ret;
+	cl_uint	ret_num_platforms;
+	cl_uint	ret_num_device;
 
-    if (!(kernel = (t_kernel*)malloc(sizeof(t_kernel))))
-        return (NULL);
-    kernel->buffer = NULL;
-    kernel->core = NULL;
-    kernel->ctx = NULL;
-    kernel->queue = NULL;
-    kernel->prog = NULL;
-    if (clGetPlatformIDs(1, &kernel->platform, &ret_num_platforms))
-    	return (NULL);
-    if (clGetDeviceIDs(kernel->platform, type, 1, &kernel->device,
-    		&ret_num_device))
+	if (!(*kernel = (t_kernel*)malloc(sizeof(t_kernel))))
 		return (NULL);
-    print_device_info(kernel->device);
-    kernel->ctx = clCreateContext(0, 1, &kernel->device, NULL, NULL, &ret);
-    if (ret != CL_SUCCESS)
-        return (NULL);
-    kernel->queue = clCreateCommandQueue(kernel->ctx, kernel->device, 0, &ret);
-    if (ret != CL_SUCCESS)
-        return (NULL);
-    return (kernel);
+	(*kernel)->buffer = NULL;
+	(*kernel)->core = NULL;
+	(*kernel)->ctx = NULL;
+	(*kernel)->queue = NULL;
+	(*kernel)->prog = NULL;
+	if (clGetPlatformIDs(1, &(*kernel)->platform, &ret_num_platforms))
+		return (NULL);
+	if (clGetDeviceIDs((*kernel)->platform, type, 1, &(*kernel)->device,
+			&ret_num_device))
+		return (NULL);
+	// print_device_info((*kernel)->device);
+	(*kernel)->ctx = clCreateContext(0, 1, &(*kernel)->device, NULL, NULL, &ret);
+	if (ret != CL_SUCCESS)
+		return (NULL);
+	(*kernel)->queue = clCreateCommandQueue((*kernel)->ctx, (*kernel)->device,
+			0, &ret);
+	if (ret != CL_SUCCESS)
+		return (NULL);
+	return (*kernel);
 }
 
-int load_kernel(t_kernel *kernel, char *name)
+int			load_kernel(t_kernel *kernel, char *name)
 {
-    char    *source;
-    size_t  len;
-    int     ret;
+	char	*source;
+	size_t	len;
+	int		ret;
 
-    if (!(source = read_kernel("./sources/fractals.cl")))
-        return (1);
-    len = ft_strlen(source);
-    kernel->prog = clCreateProgramWithSource(kernel->ctx, 1,
-    		(const char **)&source, &len, &ret);
+	if (!(source = read_kernel("./sources/fractals.cl")))
+		return (1);
+	len = ft_strlen(source);
+	kernel->prog = clCreateProgramWithSource(kernel->ctx, 1,
+			(const char **)&source, &len, &ret);
 	ft_strdel(&source);
-    if (ret != CL_SUCCESS)
-        return (1);
-    if (clBuildProgram(kernel->prog, 1, &kernel->device, NULL, NULL, NULL))
-    {
-        get_build_log(kernel->prog, kernel->device, ret);
-        return (1);
-    }
-    kernel->core = clCreateKernel(kernel->prog, name, &ret);
-    if (ret != CL_SUCCESS)
-        return (1);
-    return (0);
+	if (ret != CL_SUCCESS)
+		return (1);
+	if (clBuildProgram(kernel->prog, 1, &kernel->device, NULL, NULL, NULL))
+	{
+		get_build_log(kernel->prog, kernel->device, ret);
+		return (1);
+	}
+	kernel->core = clCreateKernel(kernel->prog, name, &ret);
+	if (ret != CL_SUCCESS)
+		return (1);
+	return (0);
 }
 
-int set_args_kernel(t_kernel *krnl)
+int		set_args_kernel(t_kernel *krnl)
 {
-    int         ret;
+	int			ret;
 	const int	size[2] = {WIDTH, HEIGHT};
 
-    krnl->buffer = clCreateBuffer(krnl->ctx, CL_MEM_WRITE_ONLY,
-    		sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
-    if (ret != CL_SUCCESS)
-        return (1);
-    if ((ret = clSetKernelArg(krnl->core, 0, sizeof(cl_mem), &krnl->buffer)))
-    	return (1);
+	krnl->buffer = clCreateBuffer(krnl->ctx, CL_MEM_WRITE_ONLY,
+			sizeof(int) * HEIGHT * WIDTH, NULL, &ret);
+	if (ret != CL_SUCCESS)
+		return (1);
+	if ((ret = clSetKernelArg(krnl->core, 0, sizeof(cl_mem), &krnl->buffer)))
+		return (1);
 	if ((ret = clSetKernelArg(krnl->core, 1, sizeof(cl_int2), &size)))
 		return (1);
-    return (0);
+	return (0);
 }
 
-int	run_kernel(t_fctl *fctl)
+int		run_kernel(t_fctl *fctl)
 {
 	static const size_t	global_work_size = HEIGHT * WIDTH;
 	const t_view		*v = fctl->img->view;
@@ -103,19 +102,21 @@ int	run_kernel(t_fctl *fctl)
 			&global_work_size, NULL, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
-	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) * HEIGHT * WIDTH, fctl->img->data, 0, NULL, NULL))
+	if (clEnqueueReadBuffer(krnl->queue, krnl->buffer, CL_TRUE, 0, sizeof(int) *
+	HEIGHT * WIDTH, fctl->img->data, 0, NULL, NULL))
 		return (1);
 	clFinish(krnl->queue);
 	return (0);
 }
 
-int	new_kernel(t_fctl *fctl)
+int		new_kernel(t_fctl *fctl, int device_type)
 {
 	t_kernel	*kernel;
-	if (!(kernel = init_kernel(CL_DEVICE_TYPE_GPU)))
+
+	if (!(init_kernel(&kernel, device_type)))
 		return (1);
 	if (load_kernel(kernel, fctl->name) || set_args_kernel(kernel))
 		return (1);
-    fctl->kernel = kernel;
-    return (0);
+	fctl->kernel = kernel;
+	return (0);
 }

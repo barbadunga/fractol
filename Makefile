@@ -13,7 +13,6 @@
 BIN = fractol
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g
-# CFLAGS = -g
 MLX_DIR = ./minilibx_macos/
 LIBFT_DIR = ./Libft/
 OBJ_DIR = ./objects/

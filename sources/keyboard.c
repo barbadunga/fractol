@@ -31,6 +31,12 @@ int		keyboard_event(int key, void *param)
 		v->pressed = CTRL_KEY;
 	if (key == H_KEY)
 		v->help = v->help ? 0 : 1;
+//	if (key == R_KEY)
+//		v->rgb[0] += v->rgb[0] < 1? 0.05 : 0.0;
+//	if (key == G_KEY)
+//		v->rgb[1] += v->rgb[1] < 1? 0.05 : 0.0;
+//	if (key == B_KEY)
+//		v->rgb[2] += v->rgb[2] < 1? 0.05 : 0.0;
 	render((t_fctl*)param);
 	return (1);
 }

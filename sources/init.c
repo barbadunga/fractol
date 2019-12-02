@@ -21,8 +21,6 @@ void	set_default_view(t_view *v, char *name)
 		v->radius = 2.0;
 		v->constant[0] = -0.7;
 		v->constant[1] = 0.27015;
-//		v->constant[0] = -1.0;
-//		v->constant[1] = 0.0;
 	}
 	else
 	{

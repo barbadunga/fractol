@@ -12,18 +12,6 @@
 
 #include "fractol.h"
 
-void	anti_aliasing(void	*data)
-{
-	int *img;
-	int	pixel;
-
-	img = (int*)data;
-	while (pixel < HEIGHT * WIDTH)
-	{
-		break;
-	}
-}
-
 void	show_help(t_fctl *f)
 {
 	const int	pos = 2 * HEIGHT / 3;
@@ -34,7 +22,6 @@ void	show_help(t_fctl *f)
 			"Move on: arrows, mouse");
 	mlx_string_put(f->mlx, f->win, 5, pos + 40, WHITE,
 			"Zoom: mouse wheel, +/- keys");
-	mlx_string_put(f->mlx, f->win, 5, pos + 70, WHITE, "lolchto");
 }
 
 void	show_info(t_fctl *f)
@@ -63,7 +50,6 @@ int 	render(t_fctl *f)
 {
 	if (run_kernel(f))
 		terminate("error with OpenCL kernel", &f);
-	anti_aliasing(f->img->data);
 	if (f->img->view->help)
 		fill((int*)(f->img->data), 1, 2 * HEIGHT / 3, 300, HEIGHT / 3, 0x0);
 	mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);

@@ -33,6 +33,9 @@
 # define D_KEY          2
 # define C_KEY          8
 # define S_KEY          1
+# define R_KEY			15
+# define G_KEY			5
+# define B_KEY			11
 # define L_SHIFT		43
 # define R_SHIFT		47
 # define H_KEY			4
@@ -106,7 +109,7 @@ typedef struct s_fctl
  */
 int				init_fractol(t_fctl **fctl, char *name);
 void			set_default_view(t_view *view, char *name);
-int				new_kernel(t_fctl *fctl);
+int				new_kernel(t_fctl *fctl, int device_type);
 int				check_name(char	*name);
 
 /*

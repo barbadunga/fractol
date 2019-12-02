@@ -61,17 +61,19 @@ int     mouse_move(int x, int y, void *param)
 	t_view	*v;
 
 	v = ((t_fctl*)param)->img->view;
-	if (v->pressed == -1 && (v->click[0] >= 0 || v->click[1] >= 0))
+	if (v->pressed == -1 && (v->click[0] >= 0 && v->click[1] >= 0))
 	{
 		v->center[0] -= (double)(x - v->click[0]) / WIDTH * v->radius * M_SPEED;
 		v->center[1] += (double)(y - v->click[1]) / HEIGHT* v->radius * M_SPEED;
 		v->click[0] = x;
 		v->click[1] = y;
 	}
-	if (v->pressed == CTRL_KEY)
+	if (v->pressed == CTRL_KEY && (v->click[0] >= 0 && v->click[1]))
 	{
-		v->constant[0] = -3 * sqrt((WIDTH / 2 - x) * (WIDTH / 2 - x)) / (WIDTH / 2);
-		v->constant[0] += 3 * sqrt((HEIGHT / 2 - y) * (HEIGHT / 2 - y)) / (HEIGHT / 2);
+		v->constant[0] += (double)(x - v->click[0]) / WIDTH * v->radius;
+		v->constant[1] += (double)(y - v->click[1]) / WIDTH * v->radius;
+		v->click[0] = x;
+		v->click[1] = y;
 	}
 	render((t_fctl*)param);
 	return (1);
