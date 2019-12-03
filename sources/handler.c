@@ -21,16 +21,16 @@ int		close_window(void *param)
 	return (1);
 }
 
-void    move(int key, t_view *p)
+void	move(int key, t_view *p)
 {
-    if (key == LEFT)
-        p->center[0] -= 0.1 * p->radius;
-    if (key == RIGHT)
-        p->center[0] += 0.1 * p->radius;
-    if (key == UP)
-        p->center[1] += 0.1 * p->radius;
-    if (key == DOWN)
-        p->center[1] -= 0.1 * p->radius;
+	if (key == LEFT)
+		p->center[0] -= 0.1 * p->radius;
+	if (key == RIGHT)
+		p->center[0] += 0.1 * p->radius;
+	if (key == UP)
+		p->center[1] += 0.1 * p->radius;
+	if (key == DOWN)
+		p->center[1] -= 0.1 * p->radius;
 }
 
 void	event_handler(t_fctl *fctl)

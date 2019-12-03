@@ -30,8 +30,8 @@ t_kernel	*init_kernel(t_kernel **kernel, int type)
 	if (clGetDeviceIDs((*kernel)->platform, type, 1, &(*kernel)->device,
 			&ret_num_device))
 		return (NULL);
-	// print_device_info((*kernel)->device);
-	(*kernel)->ctx = clCreateContext(0, 1, &(*kernel)->device, NULL, NULL, &ret);
+	(*kernel)->ctx = clCreateContext(0, 1, &(*kernel)->device, NULL, NULL,
+			&ret);
 	if (ret != CL_SUCCESS)
 		return (NULL);
 	(*kernel)->queue = clCreateCommandQueue((*kernel)->ctx, (*kernel)->device,
@@ -66,7 +66,7 @@ int			load_kernel(t_kernel *kernel, char *name)
 	return (0);
 }
 
-int		set_args_kernel(t_kernel *krnl)
+int			set_args_kernel(t_kernel *krnl)
 {
 	int			ret;
 	const int	size[2] = {WIDTH, HEIGHT};
@@ -82,11 +82,11 @@ int		set_args_kernel(t_kernel *krnl)
 	return (0);
 }
 
-int		run_kernel(t_fctl *fctl)
+int			run_kernel(t_fctl *fctl)
 {
-	static const size_t	global_work_size = HEIGHT * WIDTH;
-	const t_view		*v = fctl->img->view;
-	const t_kernel		*krnl = fctl->kernel;
+	const size_t	global_work_size = HEIGHT * WIDTH;
+	const t_view	*v = fctl->view;
+	const t_kernel	*krnl = fctl->kernel;
 
 	if (clSetKernelArg(krnl->core, 2, sizeof(cl_double2), &(v->center)))
 		return (1);
@@ -109,7 +109,7 @@ int		run_kernel(t_fctl *fctl)
 	return (0);
 }
 
-int		new_kernel(t_fctl *fctl, int device_type)
+int			new_kernel(t_fctl *fctl, int device_type)
 {
 	t_kernel	*kernel;
 

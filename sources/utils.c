@@ -12,7 +12,7 @@
 
 #include "fractol.h"
 
-void	terminate(char	*err, t_fctl **fractol)
+void	terminate(char *err, t_fctl **fractol)
 {
 	if (err)
 		ft_putendl(err);
@@ -20,8 +20,8 @@ void	terminate(char	*err, t_fctl **fractol)
 	{
 		if ((*fractol)->win)
 			mlx_destroy_window((*fractol)->mlx, (*fractol)->win);
-		if ((*fractol)->img->view)
-			free((*fractol)->img->view);
+		if ((*fractol)->view)
+			free((*fractol)->view);
 		if ((*fractol)->img)
 		{
 			free((*fractol)->img);
@@ -39,7 +39,7 @@ void	terminate(char	*err, t_fctl **fractol)
 	exit(err ? EXIT_FAILURE : EXIT_SUCCESS);
 }
 
-void        destroy_kernel(t_kernel *kernel)
+void	destroy_kernel(t_kernel *kernel)
 {
 	if (kernel->core)
 		clReleaseKernel(kernel->core);
@@ -53,7 +53,7 @@ void        destroy_kernel(t_kernel *kernel)
 		clReleaseProgram(kernel->prog);
 }
 
-char *read_kernel(char *filename)
+char	*read_kernel(char *filename)
 {
 	int		fd;
 	char	*kernel;
@@ -66,40 +66,17 @@ char *read_kernel(char *filename)
 	if (fd < 0 && read(fd, NULL, 0) < 0)
 		return (NULL);
 	while ((read(fd, buf, 1)) > 0)
-		if (!ft_vec_add(&vec, buf)) // free vec before
+		if (!ft_vec_add(&vec, buf))
 			return (NULL);
 	ft_vec_add(&vec, "\0");
 	if (!(kernel = (char*)malloc(vec->total)))
-		return (NULL); // free vec before
+	{
+		ft_vec_del(&vec);
+		return (NULL);
+	}
 	ft_strncpy(kernel, vec->data, vec->total + 1);
 	ft_vec_del(&vec);
 	if (close(fd) < 0)
 		return (NULL);
 	return (kernel);
-}
-
-void	fill(int *data, int x, int y, int width, int height, int color)
-{
-	int		start;
-	int		line;
-	int dat;
-
-	start = x;
-	line = y;
-	width += x;
-	height += y;
-	while (y < height && y < HEIGHT)
-	{
-		x = start;
-		while (x < width && x < WIDTH)
-		{
-			dat = data[y * WIDTH + x];
-			if (y == line || y == height - 1 || x == start || x == width - 1)
-				data[y * WIDTH + x] = 0xC0C0C0;
-			else
-				data[y * WIDTH + x] = color; // change on shading the color
-			x++;
-		}
-		y++;
-	}
 }

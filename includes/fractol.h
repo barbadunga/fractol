@@ -22,6 +22,7 @@
  * Keyboard keys MacOs
  */
 # define LEFT_BUTTON    1
+# define RIGHT_BUTTON	2
 # define SCROLL_UP      4
 # define SCROLL_DOWN    5
 # define LEFT           123
@@ -59,7 +60,20 @@
 # define HEIGHT			900
 # define WIDTH			900
 # define M_SPEED		1.5
-# define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia"
+# define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia\n --> Ship"
+
+typedef struct	s_int3
+{
+	int	x;
+	int y;
+	int	z;
+}				t_int3;
+
+typedef struct	s_int2
+{
+	int	x;
+	int	y;
+}				t_int2;
 
 typedef struct	s_kernel
 {
@@ -86,7 +100,6 @@ typedef	struct	s_view
 
 typedef struct	s_img
 {
-	t_view	*view;
 	void	*img_ptr;
 	char	*data;
 	int		bpp;
@@ -102,6 +115,7 @@ typedef struct s_fctl
 	t_img		*img;
 	t_kernel	*kernel;
 	char		*name;
+	t_view		*view;
 }				t_fctl;
 
 /*
@@ -118,7 +132,7 @@ int				check_name(char	*name);
 void			terminate(char *err, t_fctl **fractol);
 void			destroy_kernel(t_kernel *kernel);
 char			*read_kernel(char *filename);
-void			fill(int *data, int x, int y, int w, int h, int color);
+void			fill_rectangle(void *ptr,t_int2 start, t_int3 box);
 
 /*
  * Main funcs
