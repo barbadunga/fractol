@@ -25,7 +25,6 @@ void	set_default_view(t_view *v, char *name)
 	else
 	{
 		v->radius = !ft_strcmp("ship", name) ? 2.0 : 1.5;
-//		v->radius = 1.5;
 		v->center[0] = -0.5;
 		v->center[1] = 0.0;
 	}

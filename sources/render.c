@@ -12,6 +12,11 @@
 
 #include "fractol.h"
 
+void	down_sample(int *data)
+{
+
+}
+
 void	show_help(t_fctl *f)
 {
 	const int	pos = 2 * HEIGHT / 3;
@@ -62,6 +67,7 @@ int		render(t_fctl *f)
 {
 	if (run_kernel(f))
 		terminate("error with OpenCL kernel", &f);
+	down_sample((int*)f->img->data);
 	mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);
 	show_info(f);
 	return (1);

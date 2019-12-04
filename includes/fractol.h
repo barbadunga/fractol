@@ -62,19 +62,6 @@
 # define M_SPEED		1.5
 # define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia\n --> Ship"
 
-typedef struct	s_int3
-{
-	int	x;
-	int y;
-	int	z;
-}				t_int3;
-
-typedef struct	s_int2
-{
-	int	x;
-	int	y;
-}				t_int2;
-
 typedef struct	s_kernel
 {
 	cl_kernel			core;
@@ -132,7 +119,6 @@ int				check_name(char	*name);
 void			terminate(char *err, t_fctl **fractol);
 void			destroy_kernel(t_kernel *kernel);
 char			*read_kernel(char *filename);
-void			fill_rectangle(void *ptr,t_int2 start, t_int3 box);
 
 /*
  * Main funcs
