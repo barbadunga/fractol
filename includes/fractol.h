@@ -60,7 +60,6 @@
 # define HEIGHT			900
 # define WIDTH			900
 # define M_SPEED		1.5
-# define USAGE			"usage: ./fractol [name]\n\nAvailable fractals:\n --> Mandelbrot\n --> Julia\n --> Ship"
 
 typedef struct	s_kernel
 {
@@ -95,7 +94,7 @@ typedef struct	s_img
 
 }				t_img;
 
-typedef struct s_fctl
+typedef struct	s_fctl
 {
 	void 		*mlx;
 	void		*win;
@@ -111,7 +110,7 @@ typedef struct s_fctl
 int				init_fractol(t_fctl **fctl, char *name);
 void			set_default_view(t_view *view, char *name);
 int				new_kernel(t_fctl *fctl, int device_type);
-int				check_name(char	*name);
+char			*get_name(char	*input);
 
 /*
  * Util funcs

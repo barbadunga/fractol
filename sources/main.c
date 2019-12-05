@@ -15,14 +15,17 @@
 int	main(int argc, char **argv)
 {
 	t_fctl		*fctl;
-	char		*name;
+//	char		*name;
 
 	if (argc != 2)
-		terminate(USAGE, NULL);
+		terminate("usage: ./fractol [name]\n\nAvailable fractals:\n --> M"
+			"andelbrot\n --> Julia\n --> Ship\n --> Quartic\n --> Cubic", NULL);
+//	if (!(name = get_name(argv[1])))
+//		terminate("usage: ./fractol [name]\n\nAvailable fractals:\n --> M"
+//			"andelbrot\n --> Julia\n --> Ship\n --> Quartic\n --> Cubic", NULL);
 	if (!(fctl = (t_fctl*)malloc(sizeof(t_fctl))))
 		terminate("error: malloc failure", NULL);
-	name = ft_tolowercase(argv[1]);
-	if (!init_fractol(&fctl, name))
+	if (!init_fractol(&fctl, argv[1])) //
 		terminate("error: init failure", &fctl);
 	if (new_kernel(fctl, CL_DEVICE_TYPE_GPU))
 		terminate("error: OpenCL failure", &fctl);

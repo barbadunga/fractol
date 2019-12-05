@@ -41,5 +41,5 @@ void	event_handler(t_fctl *fctl)
 	mlx_hook(fctl->win, 4, 0, mouse_press, fctl);
 	mlx_hook(fctl->win, 5, 0, mouse_release, fctl);
 	mlx_hook(fctl->win, 6, 0, mouse_move, fctl);
-	mlx_expose_hook(fctl->win, render, fctl);
+	// mlx_expose_hook(fctl->win, render, fctl);
 }
