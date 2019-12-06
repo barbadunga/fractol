@@ -18,9 +18,6 @@
 # include <OpenCL/opencl.h>
 # include <math.h>
 
-/*
- * Keyboard keys MacOs
- */
 # define LEFT_BUTTON    1
 # define RIGHT_BUTTON	2
 # define SCROLL_UP      4
@@ -44,9 +41,6 @@
 # define PLUS_KEY       24
 # define MINUS_KEY      27
 
-/*
- * Colors ARGB
- */
 # define BLACK			0x0
 # define RED			0x0000FF
 # define GREEN			0x00FF
@@ -54,9 +48,6 @@
 # define WHITE			0xFFFFFF
 # define SILVER			0xC0C0C0
 
-/*
- * Program params
- */
 # define HEIGHT			900
 # define WIDTH			900
 # define M_SPEED		1.5
@@ -64,12 +55,12 @@
 typedef struct	s_kernel
 {
 	cl_kernel			core;
-	cl_device_id        device;
-	cl_platform_id      platform;
+	cl_device_id		device;
+	cl_platform_id		platform;
 	cl_command_queue	queue;
-	cl_program          prog;
-	cl_context          ctx;
-	cl_mem              buffer;
+	cl_program			prog;
+	cl_context			ctx;
+	cl_mem				buffer;
 }				t_kernel;
 
 typedef	struct	s_view
@@ -96,7 +87,7 @@ typedef struct	s_img
 
 typedef struct	s_fctl
 {
-	void 		*mlx;
+	void		*mlx;
 	void		*win;
 	t_img		*img;
 	t_kernel	*kernel;
@@ -104,39 +95,24 @@ typedef struct	s_fctl
 	t_view		*view;
 }				t_fctl;
 
-/*
- * Init funcs
- */
 int				init_fractol(t_fctl **fctl, char *name);
 void			set_default_view(t_view *view, char *name);
 int				new_kernel(t_fctl *fctl, int device_type);
 char			*get_name(char	*input);
 
-/*
- * Util funcs
- */
 void			terminate(char *err, t_fctl **fractol);
 void			destroy_kernel(t_kernel *kernel);
 char			*read_kernel(char *filename);
 
-/*
- * Main funcs
- */
 int				render(t_fctl *f);
 void			event_handler(t_fctl *fctl);
 int				run_kernel(t_fctl *fctl);
 
-/*
- * Debug funcs
- */
 void			get_build_log(cl_program prog, cl_device_id id, cl_int errno);
 void			print_device_info(cl_device_id id);
 void			get_platform_info(cl_platform_id id);
 cl_device_id	get_device_info(cl_platform_id id, cl_device_info value_name);
 
-/*
- * Controls
- */
 int				keyboard_event(int key, void *param);
 int				keyboard_release(int key, void *param);
 int				mouse_press(int button, int x, int y, void *param);

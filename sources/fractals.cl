@@ -244,7 +244,7 @@ kernel void quartic(__global int *data, int2 size, double2 center, double radius
     data[idx] = color;
 }
 
-kernel void foo(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j, double3 pal)
+kernel void unnamed(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j, double3 pal)
 {
     int         idx = get_global_id(0);
     double2     z, c, del;
@@ -265,6 +265,89 @@ kernel void foo(__global int *data, int2 size, double2 center, double radius, in
         del = cadd(z, c);
         del = cpow(del, 3);
         z = cdel((double2)(1.0, 0.0), del);
+    }
+    data[idx] = color;
+}
+
+kernel void magnet(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j, double3 pal)
+{
+    int         idx = get_global_id(0);
+    double2     z, c, h, l, c1, c2, z2;
+    double      r2, index;
+    int         color = 0x0;
+
+    c = transform(idx, center, radius, size);
+    z.xy = (double2)(0.0, 0.0);
+    c1 = c - (double2)(1.0, 0.0);
+    c2 = c - (double2)(2.0, 0.0);
+    for (int i = 0; i < max_iter; i++)
+    {
+        r2 = cmod(z);
+        if (r2 > 4)
+        {
+            index = i - log(log(r2)) + 4;
+            color = colorize(pal, index);
+            break;
+        }
+        z2 = cpow(z, 2);
+        h = cpow(z, 4);
+        h += cmul(2 * z2, c1);
+        h += cpow(c1, 2);
+        l = 4 * z2;
+        l += 4 * cmul(z, c2);
+        l += cpow(c2, 2);
+        z = cdel(h, l);
+    }
+    data[idx] = color;
+}
+
+kernel void cactus(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j, double3 pal)
+{
+    int         idx = get_global_id(0);
+    double2     z, c, c1, tmp;
+    double      r2, index;
+    int         color = 0x0;
+
+    c = transform(idx, center, radius, size);
+    c1 = c - (double2)(1.0, 0.0);
+    z.xy = (double2)(0.0, 0.0);
+    for (int i = 0; i < max_iter; i++)
+    {
+        r2 = cmod(z);
+        if (r2 > 4)
+        {
+            index = i - log(log(r2)) + 4;
+            color = colorize(pal, index);
+            break;
+        }
+        tmp = z;
+        z = cpow(tmp, 3);
+        z += cmul(c1, tmp);
+        z -= c;
+    }
+    data[idx] = color;
+}
+
+kernel void dragon(__global int *data, int2 size, double2 center, double radius, int max_iter, double2 c_j, double3 pal)
+{
+    int         idx = get_global_id(0);
+    double2     z, tmp;
+    double      r2, index, a = 0.25688573068314641;
+    int         color = 0x0;
+
+    z = transform(idx, center, radius, size);
+    for (int i = 0; i < max_iter; i++)
+    {
+        r2 = cmod(z);
+        if (r2 > 4)
+        {
+            index = i - log(log(r2)) + 4;
+            color = colorize(pal, index);
+            break;
+        }
+        tmp = z;
+        z = cmul((double2)(cos(a), sin(a)), tmp);
+        z += cpow(tmp, 2);
     }
     data[idx] = color;
 }

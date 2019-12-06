@@ -62,7 +62,7 @@ int		render(t_fctl *f)
 {
 	if (run_kernel(f))
 		terminate("error with OpenCL kernel", &f);
-	 mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);
+	mlx_put_image_to_window(f->mlx, f->win, f->img->img_ptr, 0, 0);
 	show_info(f);
 	return (1);
 }

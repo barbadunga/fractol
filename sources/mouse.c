@@ -14,7 +14,7 @@
 
 void	zoom(t_view *v, int button, int x, int y)
 {
-	double	prev;
+	double		prev;
 
 	prev = v->radius;
 	if (button == SCROLL_UP)
@@ -47,8 +47,8 @@ void	shift_color(t_view *v, int key)
 
 int		mouse_press(int button, int x, int y, void *param)
 {
-	t_fctl	*fctl;
-	t_view	*v;
+	t_fctl		*fctl;
+	t_view		*v;
 
 	fctl = (t_fctl*)param;
 	v = fctl->view;

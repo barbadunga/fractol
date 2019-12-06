@@ -6,7 +6,7 @@
 /*   By: mshagga <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/21 14:16:49 by mshagga           #+#    #+#             */
-/*   Updated: 2019/11/21 14:16:49 by mshagga          ###   ########.fr       */
+/*   Updated: 2019/12/06 18:04:19 by mshagga          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,18 @@
 
 void	set_default_view(t_view *v, char *name)
 {
-	if (!ft_strcmp(name, "julia"))
+	if (!ft_strcmp(name, "julia") || !ft_strcmp(name, "ship"))
 	{
 		v->center[0] = 0.0;
-		v->center[1] = 0.0;
-		v->radius = 2.0;
 		v->constant[0] = -0.7;
 		v->constant[1] = 0.27015;
 	}
-	else
-	{
-		v->radius = !ft_strcmp("ship", name) ? 2.0 : 1.5;
+	else if (!ft_strcmp(name, "mandelbrot") || !ft_strcmp(name, "cactus"))
 		v->center[0] = -0.5;
-		v->center[1] = 0.0;
-	}
-	if (!ft_strcmp("phoenix", name))
-	{
-		v->constant[0] = 0.56667;
-		v->constant[1] = -0.5;
-	}
+	else
+		v->center[0] = !ft_strcmp(name, "magnet") ? 1.0 : 0.0;
+	v->center[1] = 0.0;
+	v->radius = 1.5;
 	v->max_iter = 1000;
 	v->click[0] = -1;
 	v->click[1] = -1;
@@ -43,10 +36,10 @@ void	set_default_view(t_view *v, char *name)
 	v->help = 0;
 }
 
-char	*get_name(char	*input)
+char	*get_name(char *input)
 {
-	const char	*names[] = {"mandelbrot", "julia", "ship",
-							 		"quartic", "cubic", NULL};
+	const char	*names[] = {"mandelbrot", "julia", "ship", "quartic", "cubic",
+							"unnamed", "magnet", "cactus", "dragon", NULL};
 	int			i;
 
 	i = 0;
@@ -66,7 +59,8 @@ int		init_fractol(t_fctl **fctl, char *name)
 	(*fctl)->img = NULL;
 	if (!((*fctl)->mlx = mlx_init()))
 		return (0);
-	if (!((*fctl)->win = mlx_new_window((*fctl)->mlx, WIDTH, HEIGHT, "Fract'ol")))
+	if (!((*fctl)->win = mlx_new_window((*fctl)->mlx, WIDTH, HEIGHT,
+			"Fract'ol")))
 		return (0);
 	if (!((*fctl)->img = (t_img*)malloc(sizeof(t_img))))
 		return (0);
