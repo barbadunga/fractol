@@ -33,7 +33,7 @@ void	set_default_view(t_view *v, char *name)
 		v->constant[0] = 0.56667;
 		v->constant[1] = -0.5;
 	}
-	v->max_iter = 3000;
+	v->max_iter = 1000;
 	v->click[0] = -1;
 	v->click[1] = -1;
 	v->pressed = -1;
